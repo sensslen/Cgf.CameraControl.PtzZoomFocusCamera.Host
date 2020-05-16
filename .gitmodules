@@ -1,0 +1,3 @@
+[submodule "Source/CameraControl/LibLanc"]
+	path = Source/CameraControl/LibLanc
+	url = https://github.com/sensslen/LibLanc
