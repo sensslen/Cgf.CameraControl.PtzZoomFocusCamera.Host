@@ -6,9 +6,7 @@
 // Listen to the default port 5555, the Yún webserver
 // will forward there all the HTTP requests you send
 BridgeServer server;
-
-const int LancOut = 1;  // the pin which is connected to Lanc Output
-const int LancIn = 2;  // the pin which is connected to Lanc Input
+Lanc lanc(11,10);
 
 void setup(void)
 {
@@ -20,12 +18,12 @@ void setup(void)
   Bridge.begin();
   digitalWrite(LED_BUILTIN, HIGH);
 
-  Lanc::InstanceGet()->Setup(LancIn, LancOut);
-
   // Listen for incoming connection only from localhost
   // (no one from the external network could connect)
   server.listenOnLocalhost();
   server.begin();
+
+  lanc.begin();
 }
 
 
@@ -73,7 +71,7 @@ void zoomCommand(BridgeClient client) {
 
   bool successful = false;
   if (value >= -8 && value <= 8) {
-    successful = Lanc::InstanceGet()->Zoom((int8_t) value);
+    successful = lanc.Zoom((int8_t) value);
   }
 
   // Send feedback to client
@@ -95,7 +93,8 @@ void focusCommand(BridgeClient client) {
 
   bool successful = false;
   if (value >= 0 && value <= 1) {
-    successful = Lanc::InstanceGet()->Zoom((bool) value);
+    lanc.Focus((bool) value);
+    successful = true;
   }
 
   // Send feedback to client
@@ -110,9 +109,8 @@ void focusCommand(BridgeClient client) {
 }
 
 void autoFocusCommand(BridgeClient client) {
-  bool successful = Lanc::InstanceGet()->AutoFocus();
+  lanc.AutoFocus();
 
   // Send feedback to client
-  client.print(F("Autofocus Command sent successfully:"));
-  client.println(successful);
+  client.print(F("Autofocus toggle Command sent."));
 }
