@@ -1,116 +1,124 @@
 #include <LibLanc.h>
-#include <Bridge.h>
-#include <BridgeServer.h>
-#include <BridgeClient.h>
-
-// Listen to the default port 5555, the Yún webserver
-// will forward there all the HTTP requests you send
-BridgeServer server;
-Lanc lanc(11,10);
+Lanc lanc(11, 10);
+#define PAN_LEFT_PIN  5
+#define PAN_RIGHT_PIN  3
+#define TILT_UP_PIN  9
+#define TILT_DOWN_PIN  6
 
 void setup(void)
 {
-  // Bridge takes about two seconds to start up
-  // it can be helpful to use the on-board LED
-  // as an indicator for when it has initialized
+  Serial.begin(500000);
+  pinMode(PAN_LEFT_PIN, OUTPUT);
+  pinMode(PAN_RIGHT_PIN, OUTPUT);
+  pinMode(TILT_UP_PIN, OUTPUT);
+  pinMode(TILT_DOWN_PIN, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-  Bridge.begin();
-  digitalWrite(LED_BUILTIN, HIGH);
-
-  // Listen for incoming connection only from localhost
-  // (no one from the external network could connect)
-  server.listenOnLocalhost();
-  server.begin();
 
   lanc.begin();
+
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for native USB
+  }
 }
 
-
-// The main program will print the blink count
-// to the Arduino Serial Monitor
+bool aliveState = false;
 void loop(void)
-{ // Get clients coming from server
-  BridgeClient client = server.accept();
-
-  // There is a new client?
-  if (client) {
-    // Process request
-    process(client);
-
-    // Close connection and free resources.
-    client.stop();
-  }
-
-  //Poll as Quickly as possible
-  //delay(50); // Poll every 50ms
+{
+  digitalWrite(LED_BUILTIN, aliveState);
+  aliveState = !aliveState;
+  getCurrentCommand();
+  lanc.loop();
 }
 
-void process(BridgeClient client) {
-  // read the command
-  String command = client.readStringUntil('/');
+/**
+   Ask the counterpart connected via Serial port for the next commands to execute.
+   Commands are formatted as CSV and should follow this pattern:
+   |     Pan     |    Tilt     |   Zoom  |  Focus  |
+   | -255 .. 255 | -255 .. 255 | -8 .. 8 | -1 .. 1 |
 
-  if (command == "zoom") {
-    zoomCommand(client);
-  }
+   This function processes the input and issues the according commands
 
-  if (command == "focus") {
-    focusCommand(client);
-  }
+   @note Please note that focus commands override zoom commands
+*/
+void getCurrentCommand() {
+  Serial.println("next");
 
-  if (command == "autoFocus") {
-    autoFocusCommand(client);
+  auto read = Serial.readStringUntil('\n');
+  int startCharacter = read.indexOf('@');
+  if (startCharacter >= 0) {
+    auto commands = read.substring(startCharacter + 1);
+    processPan(getStringPart(commands, ','));
+    processTilt(getStringPart(commands, ','));
+    processZoom(getStringPart(commands, ','));
+    processFocus(getStringPart(commands, ','));
   }
 }
 
-void zoomCommand(BridgeClient client) {
-  int value;
+/**
+  Return the first part of the string by searching for the separator.
+  The string given with @p data is modified so that it just contains the remaining string
+*/
+String getStringPart(String &data, char separator)
+{
+  int strIndex[] = { 0, -1 };
+  int maxIndex = data.length() - 1;
 
-  // Read zoom value
-  value = client.parseInt();
-
-  bool successful = false;
-  if (value >= -8 && value <= 8) {
-    successful = lanc.Zoom((int8_t) value);
+  for (int i = 0; i <= maxIndex; i++) {
+    if (data.charAt(i) == separator) {
+      auto retval = data.substring(0, i);
+      data = data.substring(i + 1);
+      return retval;
+    }
   }
-
-  // Send feedback to client
-  client.print(F("Zoom Value"));
-  client.print(value);
-  client.print(F(" sent successfully:"));
-  client.println(successful);
-
-  // Update datastore key with the current pin value
-  String key = "Zoom";
-  Bridge.put(key, String(value));
+  auto retval = data;
+  data = "";
+  return retval;
 }
 
-void focusCommand(BridgeClient client) {
-  int value;
+void processPan(String stringValue) {
+  // conversion will return zero if no valid integer
+  int value = stringValue.toInt();
 
-  // Read focus value
-  value = client.parseInt();
-
-  bool successful = false;
-  if (value >= 0 && value <= 1) {
-    lanc.Focus((bool) value);
-    successful = true;
+  if (value < 0) {
+    analogWrite(PAN_RIGHT_PIN, 0);
+    analogWrite(PAN_LEFT_PIN, -value);
+  } else {
+    analogWrite(PAN_LEFT_PIN, 0);
+    analogWrite(PAN_RIGHT_PIN, value);
   }
-
-  // Send feedback to client
-  client.print(F("Focus Value"));
-  client.print(value);
-  client.print(F(" sent successfully:"));
-  client.println(successful);
-
-  // Update datastore key with the current pin value
-  String key = "Focus";
-  Bridge.put(key, String(value));
 }
 
-void autoFocusCommand(BridgeClient client) {
-  lanc.AutoFocus();
+void processTilt(String stringValue) {
+  // conversion will return zero if no valid integer
+  int value = stringValue.toInt();
 
-  // Send feedback to client
-  client.print(F("Autofocus toggle Command sent."));
+  if (value < 0) {
+    analogWrite(TILT_UP_PIN, 0);
+    analogWrite(TILT_DOWN_PIN, -value);
+  } else {
+    analogWrite(TILT_DOWN_PIN, 0);
+    analogWrite(TILT_UP_PIN, value);
+  }
+}
+
+void processZoom(String stringValue) {
+  // conversion will return zero if no valid integer
+  int value = stringValue.toInt();
+
+  lanc.Zoom(value);
+}
+
+void processFocus(String stringValue) {
+  // conversion will return zero if no valid integer
+  int value = stringValue.toInt();
+  switch (value) {
+    case 1:
+      lanc.Focus(false);
+      break;
+    case -1:
+      lanc.Focus(true);
+      break;
+    default:
+      break;
+  }
 }
