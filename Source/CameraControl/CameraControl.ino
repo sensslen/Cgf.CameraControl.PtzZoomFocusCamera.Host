@@ -105,6 +105,8 @@ void processZoom(String stringValue) {
   // conversion will return zero if no valid integer
   int value = stringValue.toInt();
 
+  // A value of zero will already clear the command
+  // therefore no need here to clear manually
   lanc.Zoom(value);
 }
 
@@ -119,6 +121,10 @@ void processFocus(String stringValue) {
       lanc.Focus(true);
       break;
     default:
+      // Don't clear command. This command unfortunately
+      // overwrites the Zoom command since it is processed later.
+      // (unfortunately the lanc protocol does not allow simultanous operation 
+      // of both commands)
       break;
   }
 }
