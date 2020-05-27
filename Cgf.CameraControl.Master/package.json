@@ -1,0 +1,32 @@
+{
+  "name": "cgf.cameracontrol.master",
+  "version": "1.0.0",
+  "description": "node to control cameras",
+  "main": "index.js",
+  "bin": {
+    "cgf.cameracontrol.master": "index.js"
+  },
+  "scripts": {
+    "postinstall": "patch-package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sensslen/Cgf.CameraControl.git"
+  },
+  "keywords": [
+    "camera",
+    "control"
+  ],
+  "author": "Simon Ensslen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sensslen/Cgf.CameraControl/issues"
+  },
+  "homepage": "https://github.com/sensslen/Cgf.CameraControl#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "inquirer": "^7.1.0",
+    "node-gamepad": "^0.1.15",
+    "patch-package": "^6.2.2"
+  }
+}

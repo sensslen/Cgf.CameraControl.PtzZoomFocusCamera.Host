@@ -1,11 +1,10 @@
-﻿using CGF.CameraControl.RestApi.Models;
-using CGF.CameraControl.RestApi.Services;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using CGF.CameraControl.Provider.Models;
+using CGF.CameraControl.Provider.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace CGF.CameraControl.RestApi.Controllers
+namespace CGF.CameraControl.Provider.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -1,11 +1,11 @@
-using CGF.CameraControl.RestApi.Services;
+using CGF.CameraControl.Provider.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CGF.CameraControl.RestApi
+namespace CGF.CameraControl.Provider
 {
     public class Startup
     {

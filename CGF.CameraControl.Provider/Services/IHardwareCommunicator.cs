@@ -1,7 +1,7 @@
-﻿using CGF.CameraControl.RestApi.Controllers;
-using CGF.CameraControl.RestApi.Models;
+﻿using CGF.CameraControl.Provider.Controllers;
+using CGF.CameraControl.Provider.Models;
 
-namespace CGF.CameraControl.RestApi.Services
+namespace CGF.CameraControl.Provider.Services
 {
     public interface IHardwareCommunicator
     {

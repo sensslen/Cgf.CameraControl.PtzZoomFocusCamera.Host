@@ -1,4 +1,4 @@
-﻿namespace CGF.CameraControl.RestApi.Models
+﻿namespace CGF.CameraControl.Provider.Models
 {
     public class CurrentConnection
     {
