@@ -1,0 +1,11 @@
+[
+  {
+    "ControllerType": "logitech/gamepadf310",
+    "Connections": [
+      {
+        "ConnectionUrl": "https://localhost:5001",
+        "ConnectionPort": "COM6"
+      }
+    ]
+  }
+]
