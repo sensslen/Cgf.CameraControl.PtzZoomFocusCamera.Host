@@ -4,9 +4,8 @@ class logitechF310 {
   constructor() {
     this.pad = new GamePad("logitech/gamepadf310");
     this.pad.connect();
+    console.log("Connected to:%j", this.pad._usb.getDeviceInfo());
   }
-
-  dest;
 
   onPan(callback) {
     return this.pad.on("right:move", (value) => {

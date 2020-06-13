@@ -3,7 +3,8 @@
     "ControllerType": "logitech/gamepadf310",
     "Connections": [
       {
-        "ConnectionUrl": "https://localhost:5001",
+        "ConnectionName": "Cam1",
+        "ConnectionUrl": "http://localhost:5000",
         "ConnectionPort": "COM6"
       }
     ]

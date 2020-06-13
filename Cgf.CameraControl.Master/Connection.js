@@ -20,7 +20,8 @@ class Connection {
       .get(this.connectionUrl + "/pantiltzoom/connections")
       .then((response) => {
         if (!response.data.includes(this.connectionPort)) {
-          console.log("Port:" + this.connectionPort + "is not available.");
+          console.log("Port:" + this.connectionPort + " is not available.");
+          console.log("Available Ports:" + response.data);
         } else {
           var connection = {
             connectionName: this.connectionPort,
