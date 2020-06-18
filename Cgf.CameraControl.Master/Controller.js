@@ -23,12 +23,7 @@ class Controller {
 
     this.currentConnection = 0;
 
-    this.state = {
-      pan: 0,
-      tilt: 0,
-      zoom: 0,
-      focus: 0,
-    };
+    this.state = this.emptyStateGet();
 
     this.gamepad.onPan((pan) => {
       this.state.pan = pan;
@@ -49,23 +44,39 @@ class Controller {
       this.state.focus = focus;
       this.Connections[this.currentConnection].setState(this.state);
     });
-    /*
+
     this.gamepad.onNext(() => {
-      this.currentConnection++;
-      if (this.currentConnection == this.Connections.length) {
-        this.currentConnection = 0;
+      var nextConnection = this.currentConnection++;
+      if (nextConnection > this.Connections.length) {
+        nextConnection = 0;
       }
-      this.Connections[this.currentConnection].setState(this.state);
+      if (this.currentConnection != nextConnection) {
+        this.Connections[this.currentConnection].setState(this.emptyStateGet());
+        this.currentConnection = nextConnection;
+        this.Connections[this.currentConnection].setState(this.state);
+      }
     });
 
     this.gamepad.onPrevious(() => {
-      this.currentConnection--;
-      if (this.currentConnection < 0) {
-        this.currentConnection = this.Connections.length - 1;
+      var previousConnection = this.currentconnection--;
+      if (previousconnection < 0) {
+        previousconnection = this.Connections.length;
       }
-      this.Connections[this.currentConnection].setState(this.state);
+      if (this.currentConnection != previousConnection) {
+        this.Connections[this.currentConnection].setState(this.emptyStateGet());
+        this.currentConnection = previousconnection;
+        this.Connections[this.currentConnection].setState(this.state);
+      }
     });
-    */
+  }
+
+  emptyStateGet() {
+    return {
+      pan: 0,
+      tilt: 0,
+      zoom: 0,
+      focus: 0,
+    };
   }
 }
 

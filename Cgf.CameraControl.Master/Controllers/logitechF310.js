@@ -16,7 +16,7 @@ class logitechF310 {
 
   onTilt(callback) {
     return this.pad.on("right:move", (value) => {
-      var tilt = Math.round((-value.y + 127.5) * 2);
+      var tilt = Math.round((value.y - 127.5) * 2);
       callback(Math.abs(tilt) < 20 ? 0 : tilt);
     });
   }
@@ -30,6 +30,18 @@ class logitechF310 {
   onFocus(callback) {
     return this.pad.on("left:move", (value) => {
       callback(Math.round((value.x - 127) / 64));
+    });
+  }
+
+  onNext(callback) {
+    return this.pad.on("RB:press", () => {
+      callback();
+    });
+  }
+
+  onPrevious(callback) {
+    return this.pad.on("LB:press", () => {
+      callback();
     });
   }
 }
