@@ -47,10 +47,11 @@ namespace CGF.CameraControl.Provider.Services
             {
                 switch (element.Trim())
                 {
-                    case "next":
-                        port.Write($"@{State}\n");
+                    case "v1":
+                        port.Write($"?{State.ToArduinoString(1)}\n");
                         break;
                     default:
+                        Console.WriteLine(element);
                         break;
                 }
             }
