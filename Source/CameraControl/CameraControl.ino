@@ -23,7 +23,6 @@ void setup(void)
   pinMode(PAN_RIGHT_PIN, OUTPUT);
   pinMode(TILT_UP_PIN, OUTPUT);
   pinMode(TILT_DOWN_PIN, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
 
   lanc.begin();
 
@@ -35,7 +34,6 @@ void setup(void)
   }
 }
 
-bool aliveState = false;
 void loop(void)
 {
   getCurrentCommand();
