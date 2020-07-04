@@ -25,7 +25,10 @@ namespace CGF.CameraControl.Provider.Controllers
         public IActionResult SetCurrentState(State state)
         {
             _communicator.State = state;
-            Console.WriteLine($"{state}\t{state.ToArduinoString(1)}");
+            if (!_communicator.CurrentConnection.Connected)
+            {
+                return BadRequest();
+            }
             return NoContent();
         }
 

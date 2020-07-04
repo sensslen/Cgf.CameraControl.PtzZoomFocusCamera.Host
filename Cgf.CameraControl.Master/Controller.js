@@ -23,7 +23,7 @@ class Controller {
 
     this.currentConnection = 0;
 
-    this.state = this.emptyStateGet();
+    this.state = this.idleStateGet();
 
     this.gamepad.onPan((pan) => {
       this.state.pan = pan;
@@ -51,7 +51,7 @@ class Controller {
         nextConnection = 0;
       }
       if (this.currentConnection != nextConnection) {
-        this.Connections[this.currentConnection].setState(this.emptyStateGet());
+        this.Connections[this.currentConnection].setState(this.idleStateGet());
         this.currentConnection = nextConnection;
         this.Connections[this.currentConnection].setState(this.state);
       }
@@ -63,14 +63,14 @@ class Controller {
         previousconnection = this.Connections.length;
       }
       if (this.currentConnection != previousConnection) {
-        this.Connections[this.currentConnection].setState(this.emptyStateGet());
+        this.Connections[this.currentConnection].setState(this.idleStateGet());
         this.currentConnection = previousconnection;
         this.Connections[this.currentConnection].setState(this.state);
       }
     });
   }
 
-  emptyStateGet() {
+  idleStateGet() {
     return {
       pan: 0,
       tilt: 0,
