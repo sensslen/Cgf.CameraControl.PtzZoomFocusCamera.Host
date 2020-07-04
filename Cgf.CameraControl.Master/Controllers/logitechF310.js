@@ -29,7 +29,7 @@ class logitechF310 {
 
   onFocus(callback) {
     return this.pad.on("left:move", (value) => {
-      callback(Math.round((value.x - 127) / 64));
+      callback(Math.round((value.x - 127) / 200));
     });
   }
 
