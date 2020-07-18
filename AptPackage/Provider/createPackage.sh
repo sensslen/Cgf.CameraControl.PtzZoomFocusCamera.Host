@@ -12,20 +12,20 @@ MAINTAINER='Simon Ensslen <simon.ensslen@griesser.ch>'
 
 SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-
 show_help() {
 	cat <<EOF
 Script to create an apt Package for the CGF.CameraControl.Provider package
 
 Options:
     -s|--source                 Provide a folder where the compiled source files are located.
+	-v|--version                Provide a version number that should be associated with the built 
+                                package. If not provided, a version number will be created using
+                                git revision.
     [-o|--output-location]      Select the folder to which the modified image should be stored to. 
                                 If this parameter is used, the original file is left intact and a 
                                 new one will be placed to the specified location.
     [-c|--create-output-folder] When specified, the output folder will be automatically created
-    [-v|--version]              Provide a version number that should be associated with the built 
-                                package. If not provided, a version number will be created using
-                                git revision.
+
     [-h|--help]                 Show this help.
 EOF
 }
@@ -46,7 +46,7 @@ error() {
 output_location="$HOME"
 
 pushd $SCRIPT_LOCATION
-VERSION="$DOTNET_VERSION-$(git rev-parse HEAD)"
+VERSION="-$(git rev-parse HEAD)"
 if ! git diff-index --quiet HEAD --; then
     VERSION="$VERSION-dirty"
 fi
@@ -89,6 +89,13 @@ while (("$#")); do
 		;;
 	esac
 done
+
+pushd $SCRIPT_LOCATION
+VERSION="$VERSION-$(git rev-parse HEAD)"
+if ! git diff-index --quiet HEAD --; then
+    VERSION="$VERSION-dirty"
+fi
+popd
 
 if ! [ -d "$output_location" ]; then
     if [ "$CREATE_OUTPUT_FOLDER" == "true" ]
@@ -161,31 +168,31 @@ Description: CGF.CameraControl.Provider
 EOF
 
 cat > DEBIAN/preinst << EOF
-\#\!/bin/sh
-\#
-\# Make sure previous installation is deleted so it can be created successfully
-\#
-\# This file is derived from the preinstall script of JLink_Linux_V644g_x86_64.deb 
-\#
+#!/bin/sh
+#
+# Make sure previous installation is deleted so it can be created successfully
+#
+# This file is derived from the preinstall script of JLink_Linux_V644g_x86_64.deb 
+#
 
 systemctl stop $SERVICE_NAME
 
-SYS_SYMLINK_DIR=/${$INSTALLATION_FOLDER}
-echo \"Removing \$\{SYS_SYMLINK_DIR\} ...\"
-if \[ -e \$\{SYS_SYMLINK_DIR\} \]       \# Does it exist\?
+SYS_SYMLINK_DIR=/$INSTALLATION_FOLDER
+echo "Removing \${SYS_SYMLINK_DIR} ..."
+if [ -e \${SYS_SYMLINK_DIR} ]       # Does it exist?
 then
-  if  \[ -h \$\{SYS_SYMLINK_DIR\} \]    \# Is it a symbolic link\?
+  if  [ -h \${SYS_SYMLINK_DIR} ]    # Is it a symbolic link?
   then
-    rm -f \$\{SYS_SYMLINK_DIR\}
-  elif  \[ -d \$\{SYS_SYMLINK_DIR\} \]  \# Is it a real folder\?
+    rm -f \${SYS_SYMLINK_DIR}
+  elif  [ -d \${SYS_SYMLINK_DIR} ]  # Is it a real folder?
   then
-    rm -f -r \$\{SYS_SYMLINK_DIR\}
+    rm -f -r \${SYS_SYMLINK_DIR}
   else 
-    echo \"Error: please remove \$\{SYS_SYMLINK_DIR\}\"
-    exit 1                               \# Unexpected result
+    echo "Error: please remove \${SYS_SYMLINK_DIR}"
+    exit 1                               # Unexpected result
   fi
 else
-  echo \"\$\{SYS_SYMLINK_DIR\} not found \(OK\)\"
+  echo "\${SYS_SYMLINK_DIR} not found (OK)"
 fi
 exit 0
 EOF
