@@ -154,5 +154,6 @@ void Reception_Receiving(uint8_t received) {
   }
 }
 void Reception_ReceptionComplete(uint8_t received) {
+  (void) received;
   // do nothing intentionally
 }
