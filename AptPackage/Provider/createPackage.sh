@@ -162,7 +162,7 @@ Priority: optional
 Maintainer: $MAINTAINER
 Build-Depends: debhelper (>= 10)
 Architecture: armhf
-Depends: liblttng-ust0, libcurl4, libssl1.1, libkrb5-3, zlib1g, libicu63
+Depends: liblttng-ust0, libcurl4, libssl1.1, libkrb5-3, zlib1g, libicu63, avrdude
 Description: CGF.CameraControl.Provider
  Application that exposes the capabilities of CGF.PTZ.CameraControl via a REST API
 EOF

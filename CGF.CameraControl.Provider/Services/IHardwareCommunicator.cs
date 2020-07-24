@@ -1,12 +1,14 @@
-﻿using CGF.CameraControl.Provider.Controllers;
-using CGF.CameraControl.Provider.Models;
+﻿using CGF.CameraControl.Provider.Models;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace CGF.CameraControl.Provider.Services
 {
     public interface IHardwareCommunicator
     {
-        public State State { get; set; }
-        public string[] AvailableConnections { get; }
-        public CurrentConnection CurrentConnection { get; set; }
+        State State { get; set; }
+        string[] AvailableConnections { get; }
+        CurrentConnection CurrentConnection { get; set; }
+        Task<bool> UploadFirmware(Stream firmwareFile);
     }
 }

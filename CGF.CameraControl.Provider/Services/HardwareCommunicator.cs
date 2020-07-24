@@ -1,9 +1,10 @@
-﻿using CGF.CameraControl.Provider.Controllers;
-using CGF.CameraControl.Provider.Models;
+﻿using CGF.CameraControl.Provider.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CGF.CameraControl.Provider.Services
 {
@@ -77,16 +78,30 @@ namespace CGF.CameraControl.Provider.Services
             }
         }
 
-        private void StartSerialCommunication(string portname)
+        private void StartSerialCommunication(string portname = null)
+        {
+            CloseConnection();
+            if (portname != null)
+            {
+                _communicationPort.PortName = portname;
+            }
+            _communicationPort.Open();
+        }
+
+        private void CloseConnection()
         {
             if (_communicationPort.IsOpen)
             {
                 _communicationPort.Close();
             }
-            _communicationPort.PortName = portname;
-            _communicationPort.Open();
         }
 
         public void Dispose() => _communicationPort.Dispose();
+
+        public Task<bool> UploadFirmware(Stream firmwareFile)
+        {
+            CloseConnection();
+            return Task.Run(() => FirmwareUploader.DoUpload(firmwareFile, _communicationPort.PortName)).ContinueWith((previousTask) => { StartSerialCommunication(); return previousTask.Result; });
+        }
     }
 }
