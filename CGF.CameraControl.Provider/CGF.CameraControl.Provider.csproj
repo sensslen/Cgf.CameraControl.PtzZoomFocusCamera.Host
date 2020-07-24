@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="USB-avrdude.conf" />
+    <Content Remove="USB-avrdude.conf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="USB-avrdude.conf" />
+    <EmbeddedResource Include="USB-avrdude.conf" />
   </ItemGroup>
 
 
