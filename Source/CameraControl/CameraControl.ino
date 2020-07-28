@@ -6,7 +6,7 @@ Lanc lanc(11, 10);
 #define PAN_RIGHT_PIN  3
 #define TILT_UP_PIN  9
 #define TILT_DOWN_PIN  6
-#define PWM_FREQUENCY 35 //frequency (in Hz)
+#define PWM_FREQUENCY 10 //frequency (in Hz)
 
 typedef void (*tReceptionState)(uint8_t revieced);
 
