@@ -1,9 +1,12 @@
 #include <LibLanc.h>
+#include <PWM.h>
+
 Lanc lanc(11, 10);
 #define PAN_LEFT_PIN  5
 #define PAN_RIGHT_PIN  3
 #define TILT_UP_PIN  9
 #define TILT_DOWN_PIN  6
+#define PWM_FREQUENCY 35 //frequency (in Hz)
 
 typedef void (*tReceptionState)(uint8_t revieced);
 
@@ -19,10 +22,25 @@ int lastCommandRequest;
 void setup(void)
 {
   Serial.begin(500000);
+
+  //initialize all timers except for 0, to save time keeping functions
+  InitTimersSafe();
+
   pinMode(PAN_LEFT_PIN, OUTPUT);
   pinMode(PAN_RIGHT_PIN, OUTPUT);
   pinMode(TILT_UP_PIN, OUTPUT);
   pinMode(TILT_DOWN_PIN, OUTPUT);
+
+  //sets the frequency for the specified pin
+  bool success = SetPinFrequencySafe(TILT_UP_PIN, PWM_FREQUENCY);
+  success &= SetPinFrequencySafe(TILT_DOWN_PIN, PWM_FREQUENCY);
+  success &= SetPinFrequencySafe(PAN_LEFT_PIN, PWM_FREQUENCY);
+  success &= SetPinFrequencySafe(PAN_RIGHT_PIN, PWM_FREQUENCY);
+
+  if (success) {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
 
   lanc.begin();
 
@@ -96,11 +114,11 @@ void processPan() {
   int value = decodePanTilt(&receiveString[0]);
 
   if (value < 0) {
-    analogWrite(PAN_RIGHT_PIN, 0);
-    analogWrite(PAN_LEFT_PIN, -value);
+    pwmWrite(PAN_RIGHT_PIN, 0);
+    pwmWrite(PAN_LEFT_PIN, -value);
   } else {
-    analogWrite(PAN_LEFT_PIN, 0);
-    analogWrite(PAN_RIGHT_PIN, value);
+    pwmWrite(PAN_LEFT_PIN, 0);
+    pwmWrite(PAN_RIGHT_PIN, value);
   }
 }
 
@@ -108,11 +126,11 @@ void processTilt() {
   int value = decodePanTilt(&receiveString[2]);
 
   if (value < 0) {
-    analogWrite(TILT_UP_PIN, 0);
-    analogWrite(TILT_DOWN_PIN, -value);
+    pwmWrite(TILT_UP_PIN, 0);
+    pwmWrite(TILT_DOWN_PIN, -value);
   } else {
-    analogWrite(TILT_DOWN_PIN, 0);
-    analogWrite(TILT_UP_PIN, value);
+    pwmWrite(TILT_DOWN_PIN, 0);
+    pwmWrite(TILT_UP_PIN, value);
   }
 }
 
@@ -151,7 +169,7 @@ void Reception_WaitForStart(uint8_t received) {
 void Reception_Receiving(uint8_t received) {
   if (received == '\n') {
     receptionState = Reception_ReceptionComplete;
-  } else if (receivePosition < (sizeof(receiveString)/sizeof(receiveString[0]))) {
+  } else if (receivePosition < (sizeof(receiveString) / sizeof(receiveString[0]))) {
     receiveString[receivePosition] = received;
     receivePosition ++;
   }
