@@ -78,14 +78,17 @@ void getCurrentCommand() {
 }
 
 int decodePanTilt(uint8_t * data) {
-  bool negative = *data & (1 << 4);
-  int retval = ((data[0] % 16) << 5) + data[1];
+  uint8_t lowValue = data[1] - '@';
+  uint8_t highValue = data[0] - '@';
+  bool negative = highValue & (1 << 4);
+  int retval = ((highValue % 16) << 5) + lowValue;
   return (negative) ? -retval : retval;
 }
 
 int decodeZoomFocus(uint8_t * data) {
-  bool negative = (data[0] & (1 << 4)) > 0;
-  int retval = data[0] % 16;
+  uint8_t value = data[0] - '@';
+  bool negative = (value & (1 << 4)) > 0;
+  int retval = value % 16;
   return (negative) ? -retval : retval;
 }
 
