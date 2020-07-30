@@ -81,25 +81,25 @@ namespace CGF.CameraControl.Provider.Services
         private void StartSerialCommunication(string portname = null)
         {
             lock (this)
-        {
-            CloseConnection();
-            if (portname != null)
             {
-                _communicationPort.PortName = portname;
+                CloseConnection();
+                if (portname != null)
+                {
+                    _communicationPort.PortName = portname;
+                }
+                _communicationPort.Open();
             }
-            _communicationPort.Open();
-        }
         }
 
         private void CloseConnection()
         {
             lock (this)
-        {
-            if (_communicationPort.IsOpen)
             {
-                _communicationPort.Close();
+                if (_communicationPort.IsOpen)
+                {
+                    _communicationPort.Close();
+                }
             }
-        }
         }
 
         public void Dispose() => _communicationPort.Dispose();
@@ -109,8 +109,8 @@ namespace CGF.CameraControl.Provider.Services
             return Task.Run(() =>
             {
                 lock (this)
-        {
-            CloseConnection();
+                {
+                    CloseConnection();
                     var success = Task.Run(() => FirmwareUploader.DoUpload(firmwareFile, _communicationPort.PortName));
                     StartSerialCommunication();
                     return success;
