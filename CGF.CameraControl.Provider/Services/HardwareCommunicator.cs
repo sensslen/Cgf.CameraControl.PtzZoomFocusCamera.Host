@@ -80,6 +80,8 @@ namespace CGF.CameraControl.Provider.Services
 
         private void StartSerialCommunication(string portname = null)
         {
+            lock (this)
+        {
             CloseConnection();
             if (portname != null)
             {
@@ -87,21 +89,34 @@ namespace CGF.CameraControl.Provider.Services
             }
             _communicationPort.Open();
         }
+        }
 
         private void CloseConnection()
+        {
+            lock (this)
         {
             if (_communicationPort.IsOpen)
             {
                 _communicationPort.Close();
             }
         }
+        }
 
         public void Dispose() => _communicationPort.Dispose();
 
         public Task<bool> UploadFirmware(Stream firmwareFile)
         {
+            return Task.Run(() =>
+            {
+                lock (this)
+        {
             CloseConnection();
-            return Task.Run(() => FirmwareUploader.DoUpload(firmwareFile, _communicationPort.PortName)).ContinueWith((previousTask) => { StartSerialCommunication(); return previousTask.Result; });
+                    var success = Task.Run(() => FirmwareUploader.DoUpload(firmwareFile, _communicationPort.PortName));
+                    StartSerialCommunication();
+                    return success;
+                }
+            }
+            );
         }
     }
 }
