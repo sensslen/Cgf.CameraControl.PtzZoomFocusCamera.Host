@@ -1,12 +1,16 @@
 #include <LibLanc.h>
-#include <PWM.h>
+#include <TimerOne.h>
 
 Lanc lanc(11, 10);
 #define PAN_LEFT_PIN  5
 #define PAN_RIGHT_PIN  3
 #define TILT_UP_PIN  9
 #define TILT_DOWN_PIN  6
-#define PWM_FREQUENCY 35 //frequency (in Hz)
+
+typedef struct sPwmState {
+  bool pinState;
+  uint8_t value;
+} tPwmState;
 
 typedef void (*tReceptionState)(uint8_t revieced);
 
@@ -19,28 +23,23 @@ uint8_t receivePosition;
 tReceptionState receptionState;
 int lastCommandRequest;
 
+tPwmState panLeftState = {false, 0};
+tPwmState panRightState = {false, 0};
+tPwmState tiltUpState =  {false, 0};
+tPwmState tiltDownState =  {false, 0};
+uint8_t pwmCounter = 0;
+
 void setup(void)
 {
   Serial.begin(500000);
-
-  //initialize all timers except for 0, to save time keeping functions
-  InitTimersSafe();
 
   pinMode(PAN_LEFT_PIN, OUTPUT);
   pinMode(PAN_RIGHT_PIN, OUTPUT);
   pinMode(TILT_UP_PIN, OUTPUT);
   pinMode(TILT_DOWN_PIN, OUTPUT);
 
-  //sets the frequency for the specified pin
-  bool success = SetPinFrequencySafe(TILT_UP_PIN, PWM_FREQUENCY);
-  success &= SetPinFrequencySafe(TILT_DOWN_PIN, PWM_FREQUENCY);
-  success &= SetPinFrequencySafe(PAN_LEFT_PIN, PWM_FREQUENCY);
-  success &= SetPinFrequencySafe(PAN_RIGHT_PIN, PWM_FREQUENCY);
-
-  if (success) {
-    pinMode(LED_BUILTIN, OUTPUT);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
+  Timer1.initialize(200);
+  Timer1.attachInterrupt(panTiltExecute); // blinkLED to run every 0.15 seconds
 
   lanc.begin();
 
@@ -114,11 +113,11 @@ void processPan() {
   int value = decodePanTilt(&receiveString[0]);
 
   if (value < 0) {
-    pwmWrite(PAN_RIGHT_PIN, 0);
-    pwmWrite(PAN_LEFT_PIN, -value);
+    panLeftState.value = 0;
+    panRightState.value = -value;
   } else {
-    pwmWrite(PAN_LEFT_PIN, 0);
-    pwmWrite(PAN_RIGHT_PIN, value);
+    panRightState.value = 0;
+    panLeftState.value = value;
   }
 }
 
@@ -126,11 +125,11 @@ void processTilt() {
   int value = decodePanTilt(&receiveString[2]);
 
   if (value < 0) {
-    pwmWrite(TILT_UP_PIN, 0);
-    pwmWrite(TILT_DOWN_PIN, -value);
+    tiltUpState.value = 0;
+    tiltDownState.value = -value;
   } else {
-    pwmWrite(TILT_DOWN_PIN, 0);
-    pwmWrite(TILT_UP_PIN, value);
+    tiltDownState.value = 0;
+    tiltUpState.value = value;
   }
 }
 
@@ -177,4 +176,21 @@ void Reception_Receiving(uint8_t received) {
 void Reception_ReceptionComplete(uint8_t received) {
   (void) received;
   // do nothing intentionally
+}
+
+inline void executePwm(tPwmState * state, int pin) {
+    bool newState = state->value > pwmCounter;
+  if (state->pinState != newState) {
+    state->pinState = newState;
+    digitalWrite(pin, state->pinState);
+  }
+}
+
+void panTiltExecute(void)
+{
+  pwmCounter ++;
+  executePwm(&panLeftState, PAN_LEFT_PIN);
+  executePwm(&panRightState, PAN_RIGHT_PIN);
+  executePwm(&tiltUpState, TILT_UP_PIN);
+  executePwm(&tiltDownState, TILT_DOWN_PIN);
 }
