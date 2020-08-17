@@ -14,6 +14,7 @@ class Connection {
     this.connected = connectionStates.NotConnected;
     this.connectionUrl = config.ConnectionUrl;
     this.connectionPort = config.ConnectionPort;
+    this.ConnectionName = config.ConnectionName;
     this.axios = axios.create({
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
@@ -86,6 +87,10 @@ class Connection {
     this.state = state;
     this.shoudlTransmit = true;
     this.transmitNextStateIfRequestedAndPossible();
+  }
+
+  printConnection() {
+    console.log("selected Connection: " + this.ConnectionName + " (" + this.connectionUrl + ")");
   }
 }
 
