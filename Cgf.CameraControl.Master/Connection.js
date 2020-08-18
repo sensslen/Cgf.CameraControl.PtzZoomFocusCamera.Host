@@ -1,5 +1,6 @@
 const https = require("https");
 const axios = require("axios");
+const signalR = require("@microsoft/signalr");
 
 const connectionStates = {
   NotConnected: "a",
@@ -39,9 +40,26 @@ class Connection {
           this.axios
             .put(this.connectionUrl + "/pantiltzoom/connection", connection)
             .then(() => {
-              this.canTransmit = true;
-              this.connected = connectionStates.Connected;
-              this.transmitNextStateIfRequestedAndPossible();
+              this.connection = new signalR.HubConnectionBuilder()
+                .configureLogging(signalR.LogLevel.Debug)
+                .withUrl(this.connectionUrl + "/pantiltzoom/statehub")
+                .build();
+
+              this.connection.on("NewState", (state) => {
+                this.canTransmit = true;
+                console.log("Current state: " + JSON.stringify(state));
+              });
+              this.connection
+                .start()
+                .then(() => {
+                  this.canTransmit = true;
+                  this.connected = connectionStates.Connected;
+                  this.transmitNextStateIfRequestedAndPossible();
+                })
+                .catch((error) => {
+                  console.log("Socket connection setup failed.");
+                  console.log("error:" + error);
+                });
             })
             .catch((error) => {
               console.log("Failed to connect to Port:" + this.connectionPort);
@@ -69,17 +87,7 @@ class Connection {
     }
     this.canTransmit = false;
     this.shoudlTransmit = false;
-    this.axios
-      .put(this.connectionUrl + "/pantiltzoom/state", this.state)
-      .then(() => {
-        this.transmitNextStateIfRequestedAndPossible();
-        this.canTransmit = true;
-      })
-      .catch((error) => {
-        console.log(error);
-        this.connected = connectionStates.NotConnected;
-        this.Connect();
-      });
+    this.connection.invoke("SetState", this.state);
   }
 
   setState(state) {

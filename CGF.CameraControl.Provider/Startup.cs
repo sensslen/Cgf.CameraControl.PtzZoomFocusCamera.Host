@@ -1,3 +1,4 @@
+using CGF.CameraControl.Provider.Hubs;
 using CGF.CameraControl.Provider.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,7 @@ namespace CGF.CameraControl.Provider
         {
             services.AddSingleton<IHardwareCommunicator, HardwareCommunicator>();
             services.AddControllers();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -28,15 +30,12 @@ namespace CGF.CameraControl.Provider
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<StateHub>("/pantiltzoom/statehub");
             });
         }
     }
