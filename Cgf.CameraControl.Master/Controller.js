@@ -9,7 +9,7 @@ class Controller {
         break;
       default:
         console.log(`${config.ControllerType} not yet supported`);
-        break;
+        process.exit();
     }
 
     this.Connections = [];
@@ -19,6 +19,7 @@ class Controller {
 
     if (this.Connections.length == 0) {
       console.log("no connection configured");
+      process.exit();
     }
 
     this.currentConnection = 0;
@@ -55,7 +56,7 @@ class Controller {
   }
 
   changeConnection(nextConnection) {
-    nextConnection = mod(nextConnection, this.Connections.length);
+    nextConnection = this.mod(nextConnection, this.Connections.length);
 
     if (this.currentConnection != nextConnection) {
       this.Connections[this.currentConnection].setState(this.idleStateGet());

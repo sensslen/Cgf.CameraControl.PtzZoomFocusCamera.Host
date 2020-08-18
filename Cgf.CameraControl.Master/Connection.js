@@ -46,7 +46,6 @@ class Connection {
                 .build();
 
               this.connection.on("NewState", (state) => {
-                this.canTransmit = true;
                 console.log("Current state: " + JSON.stringify(state));
               });
               this.connection
@@ -87,7 +86,9 @@ class Connection {
     }
     this.canTransmit = false;
     this.shoudlTransmit = false;
-    this.connection.invoke("SetState", this.state);
+    this.connection
+      .invoke("SetState", this.state)
+      .then(() => (this.canTransmit = true));
   }
 
   setState(state) {
