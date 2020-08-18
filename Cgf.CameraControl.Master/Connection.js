@@ -10,7 +10,7 @@ const connectionStates = {
 
 class Connection {
   constructor(config) {
-    this.shoudlTransmit = false;
+    this.shouldTransmit = false;
     this.canTransmit = false;
     this.connected = connectionStates.NotConnected;
     this.connectionUrl = config.ConnectionUrl;
@@ -86,14 +86,14 @@ class Connection {
     if (!this.canTransmit) {
       return;
     }
-    if (!this.shoudlTransmit) {
+    if (!this.shouldTransmit) {
       return;
     }
     if (this.connected == connectionStates.NotConnected) {
       this.Connect();
     }
     this.canTransmit = false;
-    this.shoudlTransmit = false;
+    this.shouldTransmit = false;
     this.connection
       .invoke("SetState", this.state)
       .then(() => (this.canTransmit = true))
@@ -101,12 +101,13 @@ class Connection {
         console.log("state transmission error:");
         console.log("error:" + error);
         this.canTransmit = true;
+        this.shouldTransmit = true;
       });
   }
 
   setState(state) {
     this.state = state;
-    this.shoudlTransmit = true;
+    this.shouldTransmit = true;
     this.transmitNextStateIfRequestedAndPossible();
   }
 }
