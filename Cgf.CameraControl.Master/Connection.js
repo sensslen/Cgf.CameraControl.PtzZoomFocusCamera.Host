@@ -1,12 +1,7 @@
 const https = require("https");
 const axios = require("axios");
 const signalR = require("@microsoft/signalr");
-
-const connectionStates = {
-  NotConnected: "a",
-  Connecting: "b",
-  Connected: "c",
-};
+const { connectionStates } = require("./connectionStates");
 
 class Connection {
   constructor(config) {
