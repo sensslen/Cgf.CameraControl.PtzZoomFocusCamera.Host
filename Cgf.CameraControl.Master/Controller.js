@@ -46,28 +46,26 @@ class Controller {
     });
 
     this.gamepad.onNext(() => {
-      var nextConnection = this.currentConnection++;
-      if (nextConnection > this.Connections.length) {
-        nextConnection = 0;
-      }
-      if (this.currentConnection != nextConnection) {
-        this.Connections[this.currentConnection].setState(this.idleStateGet());
-        this.currentConnection = nextConnection;
-        this.Connections[this.currentConnection].setState(this.state);
-      }
+      changeConnection(this.currentConnection + 1);
     });
 
     this.gamepad.onPrevious(() => {
-      var previousConnection = this.currentconnection--;
-      if (previousconnection < 0) {
-        previousconnection = this.Connections.length;
-      }
-      if (this.currentConnection != previousConnection) {
-        this.Connections[this.currentConnection].setState(this.idleStateGet());
-        this.currentConnection = previousconnection;
-        this.Connections[this.currentConnection].setState(this.state);
-      }
+      changeConnection(this.currentConnection - 1);
     });
+  }
+
+  changeConnection(nextConnection) {
+    nextConnection = mod(nextConnection, this.Connections.length);
+
+    if (this.currentConnection != nextConnection) {
+      this.Connections[this.currentConnection].setState(this.idleStateGet());
+      this.currentConnection = nextConnection;
+      this.Connections[this.currentConnection].setState(this.state);
+    }
+  }
+
+  mod(n, m) {
+    return ((n % m) + m) % m;
   }
 
   idleStateGet() {
