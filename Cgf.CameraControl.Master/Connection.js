@@ -1,5 +1,6 @@
 const https = require("https");
 const axios = require("axios");
+const signalR = require("@microsoft/signalr");
 
 const connectionStates = {
   NotConnected: "a",
@@ -40,9 +41,19 @@ class Connection {
           this.axios
             .put(this.connectionUrl + "/pantiltzoom/connection", connection)
             .then(() => {
-              this.canTransmit = true;
-              this.connected = connectionStates.Connected;
-              this.transmitNextStateIfRequestedAndPossible();
+              this.connection = new signalR.HubConnectionBuilder()
+                .withAutomaticReconnect()
+                .withUrl(this.connectionUrl + "/pantiltzoom/statehub")
+                .build();
+
+              this.connection.on("NewState", (state) => {
+                console.log("Current state: " + JSON.stringify(state));
+              });
+              this.connection.onreconnected(() => {
+                this.canTransmit = true;
+                this.transmitNextStateIfRequestedAndPossible();
+              });
+              this.connectToSocket();
             })
             .catch((error) => {
               console.log("Failed to connect to Port:" + this.connectionPort);
@@ -72,16 +83,29 @@ class Connection {
       return;
     }
     this.canTransmit = false;
-    this.shoudlTransmit = false;
-    this.axios
-      .put(this.connectionUrl + "/pantiltzoom/state", this.state)
+    this.shouldTransmit = false;
+    this.connection
+      .invoke("SetState", this.state)
+      .then(() => (this.canTransmit = true))
+      .catch((error) => {
+        this.shouldTransmit = true;
+        console.log("state transmission error:");
+        console.log("error:" + error);
+      });
+  }
+
+  connectToSocket() {
+    this.connection
+      .start()
       .then(() => {
         this.canTransmit = true;
+        this.connected = connectionStates.Connected;
         this.transmitNextStateIfRequestedAndPossible();
       })
       .catch((error) => {
-        console.log(error);
-        this.connected = connectionStates.NotConnected;
+        this.connection = connectionStates.NotConnected;
+        console.log("Socket connection setup failed.");
+        console.log("error:" + error);
         this.Connect();
       });
   }

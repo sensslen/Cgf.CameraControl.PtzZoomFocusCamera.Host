@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/sensslen/Cgf.CameraControl#readme",
   "dependencies": {
+    "@microsoft/signalr": "^3.1.7",
     "axios": "^0.19.2",
     "everpolate": "0.0.3",
-    "inquirer": "^7.1.0",
     "node-gamepad": "^0.1.15",
     "patch-package": "^6.2.2"
   }
