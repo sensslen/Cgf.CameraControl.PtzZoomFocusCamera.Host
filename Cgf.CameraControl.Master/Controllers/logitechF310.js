@@ -1,4 +1,10 @@
 const GamePad = require("node-gamepad");
+const interpolate = require("everpolate").linear;
+
+const moveInterpolation = [
+  [0, 50, 115, 116, 139, 140, 205, 255],
+  [255, 50, 15, 0, 0, -15, -50, -255],
+];
 
 class logitechF310 {
   constructor() {
@@ -9,15 +15,23 @@ class logitechF310 {
 
   onPan(callback) {
     return this.pad.on("right:move", (value) => {
-      var pan = Math.round((-value.x + 127.5) * 2);
-      callback(Math.abs(pan) < 20 ? 0 : pan);
+      var interpolated = interpolate(
+        value.x,
+        moveInterpolation[0],
+        moveInterpolation[1]
+      )[0];
+      callback(Math.round(interpolated));
     });
   }
 
   onTilt(callback) {
     return this.pad.on("right:move", (value) => {
-      var tilt = Math.round((value.y - 127.5) * 2);
-      callback(Math.abs(tilt) < 20 ? 0 : tilt);
+      var interpolated = interpolate(
+        value.y,
+        moveInterpolation[0],
+        moveInterpolation[1]
+      )[0];
+      callback(Math.round(-interpolated));
     });
   }
 
