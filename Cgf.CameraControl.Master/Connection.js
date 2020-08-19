@@ -1,7 +1,11 @@
 const https = require("https");
 const axios = require("axios");
-const signalR = require("@microsoft/signalr");
-const connectionStates = require("./connectionStates");
+
+const connectionStates = {
+  NotConnected: "a",
+  Connecting: "b",
+  Connected: "c",
+};
 
 class Connection {
   constructor(config) {
@@ -27,7 +31,7 @@ class Connection {
         if (!response.data.includes(this.connectionPort)) {
           console.log("Port:" + this.connectionPort + " is not available.");
           console.log("Available Ports:" + response.data);
-          this.connected = connectionStates.NotConnected;
+          process.exit();
         } else {
           var connection = {
             connectionName: this.connectionPort,
@@ -36,23 +40,9 @@ class Connection {
           this.axios
             .put(this.connectionUrl + "/pantiltzoom/connection", connection)
             .then(() => {
-              this.connection = new signalR.HubConnectionBuilder()
-                .withAutomaticReconnect()
-                .withUrl(this.connectionUrl + "/pantiltzoom/statehub")
-                .build();
-
-              this.connection.on("NewState", (state) => {
-                console.log(
-                  "Connection: " +
-                    this.ConnectionName +
-                    " (" +
-                    this.connectionUrl +
-                    ")" +
-                    " Current state: " +
-                    JSON.stringify(state)
-                );
-              });
-              this.connectToSocket();
+              this.canTransmit = true;
+              this.connected = connectionStates.Connected;
+              this.transmitNextStateIfRequestedAndPossible();
             })
             .catch((error) => {
               console.log("Failed to connect to Port:" + this.connectionPort);
@@ -70,22 +60,6 @@ class Connection {
       });
   }
 
-  connectToSocket() {
-    this.connection
-      .start()
-      .then(() => {
-        this.canTransmit = true;
-        this.connected = connectionStates.Connected;
-        this.transmitNextStateIfRequestedAndPossible();
-      })
-      .catch((error) => {
-        this.connection = connectionStates.NotConnected;
-        console.log("Socket connection setup failed.");
-        console.log("error:" + error);
-        this.Connect();
-      });
-  }
-
   transmitNextStateIfRequestedAndPossible() {
     if (!this.canTransmit) {
       return;
@@ -95,17 +69,20 @@ class Connection {
     }
     if (this.connected == connectionStates.NotConnected) {
       this.Connect();
+      return;
     }
     this.canTransmit = false;
-    this.shouldTransmit = false;
-    this.connection
-      .invoke("SetState", this.state)
-      .then(() => (this.canTransmit = true))
-      .catch((error) => {
-        console.log("state transmission error:");
-        console.log("error:" + error);
+    this.shoudlTransmit = false;
+    this.axios
+      .put(this.connectionUrl + "/pantiltzoom/state", this.state)
+      .then(() => {
         this.canTransmit = true;
-        this.shouldTransmit = true;
+        this.transmitNextStateIfRequestedAndPossible();
+      })
+      .catch((error) => {
+        console.log(error);
+        this.connected = connectionStates.NotConnected;
+        this.Connect();
       });
   }
 
