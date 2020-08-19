@@ -1,3 +1,4 @@
+using CGF.CameraControl.Provider.Hubs;
 using CGF.CameraControl.Provider.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -17,6 +18,7 @@ namespace CGF.CameraControl.Provider
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHardwareCommunicator, HardwareCommunicator>();
+            services.AddSignalR();
             services.AddControllers();
         }
 
@@ -28,15 +30,12 @@ namespace CGF.CameraControl.Provider
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<StateHub>("/pantiltzoom/statehub");
             });
         }
     }
