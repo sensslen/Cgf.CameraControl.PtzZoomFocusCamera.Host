@@ -23,6 +23,7 @@ class Controller {
     }
 
     this.currentConnection = 0;
+    this.Connections[this.currentConnection].printConnection();
 
     this.state = this.idleStateGet();
 
@@ -47,11 +48,11 @@ class Controller {
     });
 
     this.gamepad.onNext(() => {
-      changeConnection(this.currentConnection + 1);
+      this.changeConnection(this.currentConnection + 1);
     });
 
     this.gamepad.onPrevious(() => {
-      changeConnection(this.currentConnection - 1);
+      this.changeConnection(this.currentConnection - 1);
     });
   }
 
@@ -62,6 +63,7 @@ class Controller {
       this.Connections[this.currentConnection].setState(this.idleStateGet());
       this.currentConnection = nextConnection;
       this.Connections[this.currentConnection].setState(this.state);
+      this.Connections[this.currentConnection].printConnection();
     }
   }
 

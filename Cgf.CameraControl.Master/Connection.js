@@ -1,7 +1,7 @@
 const https = require("https");
 const axios = require("axios");
 const signalR = require("@microsoft/signalr");
-const { connectionStates } = require("./connectionStates");
+const connectionStates = require("./connectionStates");
 
 class Connection {
   constructor(config) {
@@ -10,6 +10,7 @@ class Connection {
     this.connected = connectionStates.NotConnected;
     this.connectionUrl = config.ConnectionUrl;
     this.connectionPort = config.ConnectionPort;
+    this.ConnectionName = config.ConnectionName;
     this.axios = axios.create({
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
@@ -41,7 +42,15 @@ class Connection {
                 .build();
 
               this.connection.on("NewState", (state) => {
-                console.log("Current state: " + JSON.stringify(state));
+                console.log(
+                  "Connection: " +
+                    this.ConnectionName +
+                    " (" +
+                    this.connectionUrl +
+                    ")" +
+                    " Current state: " +
+                    JSON.stringify(state)
+                );
               });
               this.connectToSocket();
             })
@@ -104,6 +113,16 @@ class Connection {
     this.state = state;
     this.shouldTransmit = true;
     this.transmitNextStateIfRequestedAndPossible();
+  }
+
+  printConnection() {
+    console.log(
+      "selected Connection: " +
+        this.ConnectionName +
+        " (" +
+        this.connectionUrl +
+        ")"
+    );
   }
 }
 
