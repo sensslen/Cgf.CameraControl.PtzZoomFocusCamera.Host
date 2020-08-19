@@ -21,10 +21,37 @@ class Connection {
         rejectUnauthorized: false,
       }),
     });
-    this.Connect();
+    this.setupConnection(() => {
+      this.connection = new signalR.HubConnectionBuilder()
+        .withAutomaticReconnect()
+        .withUrl(this.connectionUrl + "/pantiltzoom/statehub")
+        .build();
+
+      this.connection.on("NewState", (state) => {
+        console.log("Current state: " + JSON.stringify(state));
+      });
+      this.connection.onreconnected(() => {
+        this.setupConnection(() =>
+          this.transmitNextStateIfRequestedAndPossible()
+        );
+      });
+      this.connection
+        .start()
+        .then(() => {
+          this.canTransmit = true;
+          this.connected = connectionStates.Connected;
+          this.transmitNextStateIfRequestedAndPossible();
+        })
+        .catch((error) => {
+          this.connection = connectionStates.NotConnected;
+          console.log("Socket connection setup failed.");
+          console.log("error:" + error);
+          this.Connect();
+        });
+    });
   }
 
-  Connect() {
+  setupConnection(callback) {
     this.connected = connectionStates.Connecting;
     this.axios
       .get(this.connectionUrl + "/pantiltzoom/connections")
@@ -41,19 +68,7 @@ class Connection {
           this.axios
             .put(this.connectionUrl + "/pantiltzoom/connection", connection)
             .then(() => {
-              this.connection = new signalR.HubConnectionBuilder()
-                .withAutomaticReconnect()
-                .withUrl(this.connectionUrl + "/pantiltzoom/statehub")
-                .build();
-
-              this.connection.on("NewState", (state) => {
-                console.log("Current state: " + JSON.stringify(state));
-              });
-              this.connection.onreconnected(() => {
-                this.canTransmit = true;
-                this.transmitNextStateIfRequestedAndPossible();
-              });
-              this.connectToSocket();
+              callback();
             })
             .catch((error) => {
               console.log("Failed to connect to Port:" + this.connectionPort);
@@ -67,7 +82,7 @@ class Connection {
         console.log("Failed to connect:" + this.connectionUrl);
         console.log("error:" + error);
         this.connected = connectionStates.NotConnected;
-        process.exit();
+        this.setupConnection(callback);
       });
   }
 
@@ -91,22 +106,6 @@ class Connection {
         this.shouldTransmit = true;
         console.log("state transmission error:");
         console.log("error:" + error);
-      });
-  }
-
-  connectToSocket() {
-    this.connection
-      .start()
-      .then(() => {
-        this.canTransmit = true;
-        this.connected = connectionStates.Connected;
-        this.transmitNextStateIfRequestedAndPossible();
-      })
-      .catch((error) => {
-        this.connection = connectionStates.NotConnected;
-        console.log("Socket connection setup failed.");
-        console.log("error:" + error);
-        this.Connect();
       });
   }
 
