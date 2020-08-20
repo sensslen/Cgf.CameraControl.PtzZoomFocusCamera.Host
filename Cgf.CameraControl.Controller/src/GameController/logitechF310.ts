@@ -1,8 +1,7 @@
 import { GamePad, JoyStickValue } from "node-gamepad";
-import { GameController } from "./GameController";
 const interpolate = require("everpolate").linear;
 
-export class logitechF310 implements GameController {
+export class logitechF310 {
   private pad: GamePad;
   private readonly moveInterpolation: number[][] = [
     [0, 50, 115, 116, 139, 140, 205, 255],

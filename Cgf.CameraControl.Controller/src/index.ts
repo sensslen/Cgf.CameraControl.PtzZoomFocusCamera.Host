@@ -1,7 +1,13 @@
-import { Controller } from "./GameController/Controller";
+import { GameController } from "./GameController/GameController";
+import { AtemConnection } from "./AtemConnection/AtemConnection";
 
 import { default as config } from "./config.json";
 
-config.forEach((element) => {
-  new Controller(element);
+var atemInstances: Record<string, AtemConnection>;
+config.AtemConnections.forEach((c) => {
+  atemInstances[c.identifier] = new AtemConnection(c);
+});
+
+config.Controllers.forEach((c) => {
+  new GameController(c, atemInstances[c.AtemConnection]);
 });

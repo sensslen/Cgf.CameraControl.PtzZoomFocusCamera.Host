@@ -1,4 +1,4 @@
-export class ConnectionConfig {
+export class CameraConnectionConfig {
   ConnectionName: string = "";
   ConnectionUrl: string = "";
   ConnectionPort: string = "";

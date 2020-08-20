@@ -1,12 +1,16 @@
-[
-  {
-    "ControllerType": "logitech/gamepadf310",
-    "Connections": [
-      {
-        "ConnectionName": "Cam1",
-        "ConnectionUrl": "http://localhost:5000",
-        "ConnectionPort": "COM6"
-      }
-    ]
-  }
-]
+{
+  "AtemConnections": [{ "identifier": "me4", "IP": "192.168.1.123" }],
+  "Controllers": [
+    {
+      "ControllerType": "logitech/gamepadf310",
+      "AtemConnection": "me4",
+      "CameraConnections": [
+        {
+          "ConnectionName": "Cam1",
+          "ConnectionUrl": "http://localhost:5000",
+          "ConnectionPort": "COM6"
+        }
+      ]
+    }
+  ]
+}

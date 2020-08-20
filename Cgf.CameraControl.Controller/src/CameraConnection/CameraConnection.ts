@@ -2,7 +2,7 @@ import { State } from "../State";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import signalR from "@microsoft/signalr";
-import { ConnectionConfig } from "./ConnectionConfig";
+import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
 enum ConnectionState {
   NotConnected,
@@ -10,16 +10,16 @@ enum ConnectionState {
   Connected,
 }
 
-export class Connection {
+export class CameraConnection {
   private shouldTransmit: boolean = false;
   private canTransmit: boolean = false;
   private connectionState: ConnectionState = ConnectionState.NotConnected;
-  private readonly config: ConnectionConfig;
+  private readonly config: CameraConnectionConfig;
   private readonly axios: AxiosInstance;
   private socketConnection: signalR.HubConnection;
   private currentState: State = new State();
 
-  constructor(config: ConnectionConfig) {
+  constructor(config: CameraConnectionConfig) {
     this.config = config;
     this.axios = axios.create({
       url: config.ConnectionUrl,
