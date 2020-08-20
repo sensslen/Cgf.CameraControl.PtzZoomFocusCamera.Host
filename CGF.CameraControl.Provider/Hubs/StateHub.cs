@@ -14,10 +14,15 @@ namespace CGF.CameraControl.Provider.Hubs
             _hardwareCommunicator = hardwareCommunicator;
         }
 
-        public async Task SetState(State state)
+        public async Task<bool> SetState(State state)
         {
             _hardwareCommunicator.State = state;
+            if (!_hardwareCommunicator.CurrentConnection.Connected)
+            {
+                return false;
+            }
             await Clients.All.SendAsync("NewState", state);
+            return true;
         }
     }
 }
