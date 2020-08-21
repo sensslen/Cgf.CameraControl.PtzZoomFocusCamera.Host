@@ -1,0 +1,56 @@
+import { GamePad, JoyStickValue } from "node-gamepad";
+const interpolate = require("everpolate").linear;
+
+export class logitechF310 {
+  private pad: GamePad;
+  private readonly moveInterpolation: number[][] = [
+    [0, 50, 115, 116, 139, 140, 205, 255],
+    [255, 50, 15, 0, 0, -15, -50, -255],
+  ];
+
+  constructor(
+    onPan: (value: number) => void,
+    onTilt: (value: number) => void,
+    onZoom: (value: number) => void,
+    onFocus: (value: number) => void,
+    onNext: () => void,
+    onPrevious: () => void,
+    padSerialNumber?: string
+  ) {
+    if (padSerialNumber === undefined) {
+      throw new Error(
+        "Unfortunately identification of controllers by serial number is not yet supported"
+      );
+    }
+    this.pad = new GamePad("logitech/gamepadf310");
+    this.pad.connect();
+
+    this.pad.on("right:move", (value: JoyStickValue) => {
+      var pan = interpolate(
+        value.x,
+        this.moveInterpolation[0],
+        this.moveInterpolation[1]
+      )[0];
+      onPan(Math.round(pan));
+      var tilt = interpolate(
+        value.y,
+        this.moveInterpolation[0],
+        this.moveInterpolation[1]
+      )[0];
+      onTilt(Math.round(tilt));
+    });
+
+    this.pad.on("left:move", (value: JoyStickValue) => {
+      onZoom(Math.round((-value.y + 127) / 16));
+      onFocus(Math.round((value.x - 127) / 200));
+    });
+
+    this.pad.on("RB:press", () => {
+      onNext();
+    });
+
+    this.pad.on("LB:press", () => {
+      onPrevious();
+    });
+  }
+}

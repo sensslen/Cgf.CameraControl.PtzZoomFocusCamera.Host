@@ -1,7 +1,7 @@
 [
   {
     "ControllerType": "logitech/gamepadf310",
-    "Connections": [
+    "CameraConnections": [
       {
         "ConnectionName": "Cam1",
         "ConnectionUrl": "http://localhost:5000",

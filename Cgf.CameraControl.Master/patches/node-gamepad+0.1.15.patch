@@ -1,6 +1,6 @@
 diff --git a/node_modules/node-gamepad/.gitignore b/node_modules/node-gamepad/.gitignore
 new file mode 100644
-index 0000000..d35bbf7
+index 0000000..c976932
 --- /dev/null
 +++ b/node_modules/node-gamepad/.gitignore
 @@ -0,0 +1,2 @@
@@ -192,14 +192,45 @@ index 0000000..b422f0a
 +        }
 +    ]
 +}
+diff --git a/node_modules/node-gamepad/index.d.ts b/node_modules/node-gamepad/index.d.ts
+new file mode 100644
+index 0000000..8ed94f8
+--- /dev/null
++++ b/node_modules/node-gamepad/index.d.ts
+@@ -0,0 +1,25 @@
++// Type definitions for node-gamepad 0.1.15
++// Project: https://github.com/creationix/node-gamepad#readme
++// Definitions by: Simon Ensslen <https://github.com/sensslen>
++// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
++
++import { EventEmitter } from "events";
++import { inherits } from "util";
++
++declare module "node-gamepad" {
++  export interface GamePadOptions {
++    vendorID?: string;
++    productID?: string;
++  }
++
++  export class GamePad extends EventEmitter {
++    constructor(type: string, options?: GamePadOptions);
++    connect();
++    disconnect();
++  }
++
++  export interface JoyStickValue {
++    x: number;
++    y: number;
++  }
++}
 diff --git a/node_modules/node-gamepad/index.js b/node_modules/node-gamepad/index.js
-index 76ef404..c719eec 100644
+index 76ef404..68e4226 100644
 --- a/node_modules/node-gamepad/index.js
 +++ b/node_modules/node-gamepad/index.js
 @@ -42,6 +42,9 @@ function Gamepad( type, options ) {
      this._states = {};
      this._options = options || {};
-     
+ 
 +    // Expand number of max listeners to 100 (so we can listen to up to 100 event types)
 +    this.setMaxListeners(100)
 +
@@ -243,6 +274,7 @@ index 76ef404..c719eec 100644
 +        this._usb.close();
      }
  };
+\ No newline at end of file
 diff --git a/node_modules/node-gamepad/readme.md b/node_modules/node-gamepad/readme.md
 index 03b8a4e..e539c99 100644
 --- a/node_modules/node-gamepad/readme.md
