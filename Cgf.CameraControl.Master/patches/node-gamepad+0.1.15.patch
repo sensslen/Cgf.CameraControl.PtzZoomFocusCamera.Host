@@ -192,37 +192,6 @@ index 0000000..b422f0a
 +        }
 +    ]
 +}
-diff --git a/node_modules/node-gamepad/index.d.ts b/node_modules/node-gamepad/index.d.ts
-new file mode 100644
-index 0000000..8ed94f8
---- /dev/null
-+++ b/node_modules/node-gamepad/index.d.ts
-@@ -0,0 +1,25 @@
-+// Type definitions for node-gamepad 0.1.15
-+// Project: https://github.com/creationix/node-gamepad#readme
-+// Definitions by: Simon Ensslen <https://github.com/sensslen>
-+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-+
-+import { EventEmitter } from "events";
-+import { inherits } from "util";
-+
-+declare module "node-gamepad" {
-+  export interface GamePadOptions {
-+    vendorID?: string;
-+    productID?: string;
-+  }
-+
-+  export class GamePad extends EventEmitter {
-+    constructor(type: string, options?: GamePadOptions);
-+    connect();
-+    disconnect();
-+  }
-+
-+  export interface JoyStickValue {
-+    x: number;
-+    y: number;
-+  }
-+}
 diff --git a/node_modules/node-gamepad/index.js b/node_modules/node-gamepad/index.js
 index 76ef404..68e4226 100644
 --- a/node_modules/node-gamepad/index.js

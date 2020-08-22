@@ -12,6 +12,7 @@ namespace CGF.CameraControl.Provider.Services
     {
         SerialPort _communicationPort;
         string _receptionData = "";
+        bool _toggleAutofocus = false;
 
         public HardwareCommunicator()
         {
@@ -117,6 +118,44 @@ namespace CGF.CameraControl.Provider.Services
                 }
             }
             );
+        }
+
+        public void ToggleAutofocus()
+        {
+            _toggleAutofocus = true;
+        }
+
+        private string GetArduinoCommand(int version)
+        {
+            switch (version)
+            {
+                case 1:
+                    return $"{PanTiltToString(State.Pan)}{PanTiltToString(State.Tilt)}" +
+                        $"{ZoomString(State.Zoom)}{FocusString(State.Focus, _toggleAutofocus)}";
+                default:
+                    return "";
+            }
+        }
+
+        private static string PanTiltToString(int value)
+        {
+            char lowByte = (char)((Math.Abs(value) % 32) + '@');
+            char highByte = (char)((Math.Abs(value) / 32) + ((value < 0) ? (1 << 4) : 0) + '@');
+            return $"{highByte}{lowByte}";
+        }
+
+        private static string ZoomString(int value)
+        {
+            char charValue = (char)(Math.Abs(value) + ((value < 0) ? (1 << 4) : 0) + '@');
+            return $"{charValue}";
+        }
+
+        private static string FocusString(int value, bool toggleAutofocus)
+        {
+            char charValue = (char)(((value != 0) ? 1 : 0) 
+                + (toggleAutofocus ? (1 << 1) : 0)
+                +  ((value < 0) ? (1 << 4) : 0) + '@');
+            return $"{charValue}";
         }
     }
 }

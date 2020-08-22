@@ -11,7 +11,8 @@ enum ConnectionState {
 }
 
 export class CameraConnection {
-  private shouldTransmit: boolean = false;
+  private shouldTransmitState: boolean = false;
+  private shouldTransmitAutofocusToggle: boolean = false;
   private canTransmit: boolean = false;
   private connectionState: ConnectionState = ConnectionState.NotConnected;
   private readonly config: CameraConnectionConfig;
@@ -102,34 +103,56 @@ export class CameraConnection {
     if (!this.canTransmit) {
       return;
     }
-    if (!this.shouldTransmit) {
-      return;
-    }
     if (this.connectionState != ConnectionState.Connected) {
       return;
     }
-    this.canTransmit = false;
-    this.shouldTransmit = false;
-    this.socketConnection
-      .invoke("SetState", this.currentState)
-      .then((updateSuccessful: boolean) => {
-        this.canTransmit = true;
-        if (!updateSuccessful) {
-          console.log("state update failure returned - retrying");
-          this.shouldTransmit = true;
-          this.transmitNextStateIfRequestedAndPossible();
-        }
-      })
-      .catch((error) => {
-        this.shouldTransmit = true;
-        console.log("state transmission error:");
-        console.log("error:" + error);
-      });
+    if (this.shouldTransmitAutofocusToggle) {
+      this.canTransmit = false;
+      this.shouldTransmitAutofocusToggle = false;
+      this.socketConnection
+        .invoke("ToggleAutofocus")
+        .then((updateSuccessful: boolean) => {
+          this.canTransmit = true;
+          if (!updateSuccessful) {
+            console.log("state update failure returned - retrying");
+            this.shouldTransmitAutofocusToggle = true;
+            this.transmitNextStateIfRequestedAndPossible();
+          }
+        })
+        .catch((error) => {
+          this.shouldTransmitAutofocusToggle = true;
+          console.log("toggle autofocus transmission error:");
+          console.log("error:" + error);
+        });
+    } else if (this.shouldTransmitState) {
+      this.canTransmit = false;
+      this.shouldTransmitState = false;
+      this.socketConnection
+        .invoke("SetState", this.currentState)
+        .then((updateSuccessful: boolean) => {
+          this.canTransmit = true;
+          if (!updateSuccessful) {
+            console.log("state update failure returned - retrying");
+            this.shouldTransmitState = true;
+            this.transmitNextStateIfRequestedAndPossible();
+          }
+        })
+        .catch((error) => {
+          this.shouldTransmitState = true;
+          console.log("state transmission error:");
+          console.log("error:" + error);
+        });
+    }
   }
 
   setState(state: State) {
     this.currentState = state;
-    this.shouldTransmit = true;
+    this.shouldTransmitState = true;
+    this.transmitNextStateIfRequestedAndPossible();
+  }
+
+  toggleAutofocus() {
+    this.shouldTransmitAutofocusToggle = true;
     this.transmitNextStateIfRequestedAndPossible();
   }
 

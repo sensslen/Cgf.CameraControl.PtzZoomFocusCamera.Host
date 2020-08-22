@@ -26,11 +26,23 @@ namespace CGF.CameraControl.Provider.Controllers
         [Route("state")]
         public IActionResult SetCurrentState(State state)
         {
-            _communicator.State = state;
             if (!_communicator.CurrentConnection.Connected)
             {
                 return BadRequest();
             }
+            _communicator.State = state;
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("toggleAutofocus")]
+        public IActionResult ToggleAutofocus()
+        {
+            if (!_communicator.CurrentConnection.Connected)
+            {
+                return BadRequest();
+            }
+            _communicator.ToggleAutofocus();
             return NoContent();
         }
 

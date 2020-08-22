@@ -16,12 +16,22 @@ namespace CGF.CameraControl.Provider.Hubs
 
         public async Task<bool> SetState(State state)
         {
-            _hardwareCommunicator.State = state;
             if (!_hardwareCommunicator.CurrentConnection.Connected)
             {
                 return false;
             }
+            _hardwareCommunicator.State = state;
             await Clients.All.SendAsync("NewState", state);
+            return true;
+        }
+
+        public bool ToggleAutofocus()
+        {
+            if (!_hardwareCommunicator.CurrentConnection.Connected)
+            {
+                return false;
+            }
+            _hardwareCommunicator.ToggleAutofocus();
             return true;
         }
     }

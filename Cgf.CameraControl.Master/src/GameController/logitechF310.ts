@@ -1,8 +1,13 @@
-import { GamePad, JoyStickValue } from "node-gamepad";
+const Gamepad = require("node-gamepad");
 const interpolate = require("everpolate").linear;
 
+interface JoyStickValue {
+  x: number;
+  y: number;
+}
+
 export class logitechF310 {
-  private pad: GamePad;
+  private pad: any;
   private readonly moveInterpolation: number[][] = [
     [0, 50, 115, 116, 139, 140, 205, 255],
     [255, 50, 15, 0, 0, -15, -50, -255],
@@ -17,12 +22,12 @@ export class logitechF310 {
     onPrevious: () => void,
     padSerialNumber?: string
   ) {
-    if (padSerialNumber === undefined) {
+    if (!(padSerialNumber === undefined)) {
       throw new Error(
         "Unfortunately identification of controllers by serial number is not yet supported"
       );
     }
-    this.pad = new GamePad("logitech/gamepadf310");
+    this.pad = new Gamepad("logitech/gamepadf310");
     this.pad.connect();
 
     this.pad.on("right:move", (value: JoyStickValue) => {

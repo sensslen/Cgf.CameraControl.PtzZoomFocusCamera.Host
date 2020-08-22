@@ -10,5 +10,6 @@ namespace CGF.CameraControl.Provider.Services
         string[] AvailableConnections { get; }
         CurrentConnection CurrentConnection { get; set; }
         Task<bool> UploadFirmware(Stream firmwareFile);
+        void ToggleAutofocus();
     }
 }
