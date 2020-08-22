@@ -2,13 +2,14 @@ import { logitechF310 } from "./logitechF310";
 import { CameraConnection } from "../CameraConnection/CameraConnection";
 import { State } from "../State";
 import { ControllerConfig } from "./ControllerConfig";
+import { AtemConnection } from "../AtemConnection/AtemConnection";
 
 export class GameController {
   private state: State;
   private cameraConnections: Array<CameraConnection> = [];
   private currentConnection: number = 0;
 
-  constructor(config: ControllerConfig) {
+  constructor(config: ControllerConfig, atem: AtemConnection) {
     this.state = new State();
     switch (config.ControllerType) {
       case "logitech/gamepadf310":
