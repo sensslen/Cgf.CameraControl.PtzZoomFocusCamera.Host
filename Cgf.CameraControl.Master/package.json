@@ -34,7 +34,6 @@
     "atem-connection": "^2.0.0",
     "axios": "^0.19.2",
     "everpolate": "0.0.3",
-    "node-gamepad": "^0.1.15",
-    "prune": "0.0.2"
+    "node-gamepad": "^0.1.15"
   }
 }
