@@ -19,7 +19,7 @@ export class logitechF310 {
     onZoom: (value: number) => void,
     onFocus: (value: number) => void,
     selectCamera: (advance: number) => void,
-    toggleAutofocus : () => void
+    toggleAutofocus: () => void,
     padSerialNumber?: string
   ) {
     if (!(padSerialNumber === undefined)) {
