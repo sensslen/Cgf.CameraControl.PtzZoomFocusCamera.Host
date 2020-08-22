@@ -1,13 +1,14 @@
 import { GameController } from "./GameController/GameController";
 import { AtemConnection } from "./AtemConnection/AtemConnection";
+import Dictionary from "./Dictionary/Dictionary";
 
 import { default as config } from "./config.json";
 
-var atemInstances: Record<string, AtemConnection>;
+var atemInstances = new Dictionary<AtemConnection>();
 config.AtemConnections.forEach((c) => {
-  atemInstances[c.identifier] = new AtemConnection(c);
+  atemInstances.add(c.identifier, new AtemConnection(c));
 });
 
 config.Controllers.forEach((c) => {
-  new GameController(c, atemInstances[c.AtemConnection]);
+  new GameController(c, atemInstances.getItem(c.AtemConnection));
 });
