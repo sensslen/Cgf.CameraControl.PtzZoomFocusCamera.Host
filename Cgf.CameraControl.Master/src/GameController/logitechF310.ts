@@ -18,8 +18,8 @@ export class logitechF310 {
     onTilt: (value: number) => void,
     onZoom: (value: number) => void,
     onFocus: (value: number) => void,
-    onNext: () => void,
-    onPrevious: () => void,
+    selectCamera: (advance: number) => void,
+    toggleAutofocus : () => void
     padSerialNumber?: string
   ) {
     if (!(padSerialNumber === undefined)) {
@@ -50,12 +50,28 @@ export class logitechF310 {
       onFocus(Math.round((value.x - 127) / 200));
     });
 
+    this.pad.on("dpadLeft:press", () => {
+      selectCamera(-1);
+    });
+
+    this.pad.on("dpadUp:press", () => {
+      selectCamera(-4);
+    });
+
+    this.pad.on("dpadRight:press", () => {
+      selectCamera(1);
+    });
+
+    this.pad.on("dpadDown:press", () => {
+      selectCamera(4);
+    });
+
     this.pad.on("RB:press", () => {
-      onNext();
+      toggleAutofocus();
     });
 
     this.pad.on("LB:press", () => {
-      onPrevious();
+      toggleAutofocus();
     });
   }
 }

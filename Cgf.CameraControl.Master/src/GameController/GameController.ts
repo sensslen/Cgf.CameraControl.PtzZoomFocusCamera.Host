@@ -17,8 +17,8 @@ export class GameController {
           this.onTilt,
           this.onZoom,
           this.onFocus,
-          this.onNext,
-          this.onPrevious
+          this.advanceCamera,
+          this.toggleAutofocus
         );
         break;
       default:
@@ -50,12 +50,12 @@ export class GameController {
     this.cameraConnections[this.currentConnection].setState(this.state);
   }
 
-  onNext() {
-    this.changeConnection(this.currentConnection + 1);
+  advanceCamera(advance: number) {
+    this.changeConnection(this.currentConnection + advance);
   }
 
-  onPrevious() {
-    this.changeConnection(this.currentConnection - 1);
+  toggleAutofocus() {
+    this.cameraConnections[this.currentConnection].toggleAutofocus();
   }
 
   changeConnection(nextConnection: number) {
