@@ -1,11 +1,11 @@
 #include <LibLanc.h>
 #include <TimerOne.h>
 
-Lanc lanc(11, 10);
+Lanc lanc(13, 12);
 #define PAN_LEFT_PIN  5
 #define PAN_RIGHT_PIN  3
-#define TILT_UP_PIN  9
-#define TILT_DOWN_PIN  6
+#define TILT_UP_PIN  6
+#define TILT_DOWN_PIN  9
 
 typedef struct sPwmState {
   bool pinState;
