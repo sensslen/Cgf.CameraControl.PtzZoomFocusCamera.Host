@@ -102,11 +102,18 @@ int decodePanTilt(uint8_t * data) {
   return (negative) ? -retval : retval;
 }
 
-int decodeZoomFocus(uint8_t * data) {
+int decodeZoom(uint8_t * data) {
   uint8_t value = data[0] - '@';
   bool negative = (value & (1 << 4)) > 0;
   int retval = value % 16;
   return (negative) ? -retval : retval;
+}
+
+void decodeFocus(uint8_t * data, int * focusValue, bool * toggleAutofocus) {
+  uint8_t value = data[0] - '@';
+  bool negative = (value & (1 << 4)) > 0;
+  *focusValue = (negative) ? value & (1 << 0) : value & (1 << 0);
+  * toggleAutofocus = (value & (1 << 1)) != 0;
 }
 
 void processPan() {
@@ -134,7 +141,7 @@ void processTilt() {
 }
 
 void processZoom() {
-  int value = decodeZoomFocus(&receiveString[4]);
+  int value = decodeZoom(&receiveString[4]);
 
   // A value of zero will already clear the command
   // therefore no need here to clear manually
@@ -142,21 +149,21 @@ void processZoom() {
 }
 
 void processFocus() {
-  int value = decodeZoomFocus(&receiveString[5]);
-  switch (value) {
-    case 1:
-      lanc.Focus(false);
-      break;
-    case -1:
-      lanc.Focus(true);
-      break;
-    default:
-      // Don't clear command. This command unfortunately
-      // overwrites the Zoom command since it is processed later.
-      // (unfortunately the lanc protocol does not allow simultanous operation
-      // of both commands)
-      break;
+  bool toggleAutofocus = false;
+  int focusValue = 0;
+  decodeFocus(&receiveString[5], &focusValue, &toggleAutofocus);
+
+  if (toggleAutofocus) {
+    lanc.AutoFocus();
+  } else if (focusValue > 0) {
+    lanc.Focus(false);
+  } else if (focusValue < 0) {
+    lanc.Focus(true);
   }
+  // Don't clear command. This command unfortunately
+  // overwrites the Zoom command since it is processed later.
+  // (unfortunately the lanc protocol does not allow simultanous operation
+  // of both commands)
 }
 
 void Reception_WaitForStart(uint8_t received) {
@@ -179,7 +186,7 @@ void Reception_ReceptionComplete(uint8_t received) {
 }
 
 inline void executePwm(tPwmState * state, int pin) {
-    bool newState = state->value > pwmCounter;
+  bool newState = state->value > pwmCounter;
   if (state->pinState != newState) {
     state->pinState = newState;
     digitalWrite(pin, state->pinState);
