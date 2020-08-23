@@ -4,7 +4,7 @@
 # Date:			26.04.19
 # 
 # Description:	
-# Generate package for CGF.CameraControl.Provider service
+# Generate package for Cgf.CameraControl.Provider service
 # ------------------------------------------------------------------
 
 # Prequisits - only change these lines
@@ -14,7 +14,7 @@ SCRIPT_LOCATION="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd
 
 show_help() {
 	cat <<EOF
-Script to create an apt Package for the CGF.CameraControl.Provider package
+Script to create an apt Package for the Cgf.CameraControl.Provider package
 
 Options:
     -s|--source                 Provide a folder where the compiled source files are located.
@@ -134,7 +134,7 @@ mkdir -p $INSTALLATION_FOLDER
 cp -r $source/* $INSTALLATION_FOLDER
 
 mkdir -p lib/systemd/system
-SERVICE_NAME=cgfcameracontrolprovider.service
+SERVICE_NAME=cgf-cameracontrol-camerahost.service
 cat > lib/systemd/system/$SERVICE_NAME << EOF
 [Unit]
 Description=Service that allows to control a Pan Tilt Zoom camera using a REST API
@@ -144,7 +144,7 @@ After=network.target
 Type=simple
 Restart=always
 RestartSec=1
-ExecStart=/opt/CgfCameraControl/CGF.CameraControl.Provider --urls http://0.0.0.0:5001
+ExecStart=/$INSTALLATION_FOLDER/Cgf.CameraControl.CameraHost --urls http://0.0.0.0:5001
 
 [Install]
 WantedBy=multi-user.target
@@ -163,8 +163,8 @@ Maintainer: $MAINTAINER
 Build-Depends: debhelper (>= 10)
 Architecture: armhf
 Depends: liblttng-ust0, libcurl4, libssl1.1, libkrb5-3, zlib1g, libicu63, avrdude
-Description: CGF.CameraControl.Provider
- Application that exposes the capabilities of CGF.PTZ.CameraControl via a REST API
+Description: Cgf.CameraControl.CameraHost
+ Application that exposes the capabilities of Cgf.CameraControl.CameraController via a REST API and Websocket API
 EOF
 
 cat > DEBIAN/preinst << EOF
