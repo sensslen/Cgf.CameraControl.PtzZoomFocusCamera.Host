@@ -38,9 +38,9 @@ export class CameraConnection {
 
   private initialConnect() {
     this.setupRemote(() => {
-      this.socketConnection.on("NewState", (state: State) => {
+      /*this.socketConnection.on("NewState", (state: State) => {
         console.log("Current state: " + JSON.stringify(state));
-      });
+      });*/
       this.socketConnection.onreconnected(() => {
         this.setupRemote(() => this.transmitNextStateIfRequestedAndPossible());
       });
