@@ -1,4 +1,4 @@
-﻿namespace CGF.CameraControl.Provider.Models
+﻿namespace CGF.CameraControl.CameraHost.Models
 {
     public class CurrentConnection
     {

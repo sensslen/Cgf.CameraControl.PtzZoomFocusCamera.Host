@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace CGF.CameraControl.Provider
+namespace CGF.CameraControl.CameraHost
 {
     public class Program
     {

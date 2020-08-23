@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
-namespace CGF.CameraControl.Provider.Services
+namespace CGF.CameraControl.CameraHost.Services
 {
     static class FirmwareUploader
     {

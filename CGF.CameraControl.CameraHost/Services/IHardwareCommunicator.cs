@@ -1,8 +1,8 @@
-﻿using CGF.CameraControl.Provider.Models;
+﻿using CGF.CameraControl.CameraHost.Models;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace CGF.CameraControl.Provider.Services
+namespace CGF.CameraControl.CameraHost.Services
 {
     public interface IHardwareCommunicator
     {
