@@ -141,8 +141,8 @@ export class CameraConnection {
           if (!updateSuccessful) {
             console.log("state update failure returned - retrying");
             this.shouldTransmitState = true;
-            this.transmitNextStateIfRequestedAndPossible();
           }
+          this.transmitNextStateIfRequestedAndPossible();
         })
         .catch((error) => {
           this.shouldTransmitState = true;
