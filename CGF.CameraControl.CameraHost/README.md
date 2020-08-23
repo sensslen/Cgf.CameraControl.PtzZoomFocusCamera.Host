@@ -1,6 +1,6 @@
 # Cgf.CameraControl.CameraHost
 
-C# Application that receives commands (e.g. from [Cgf.CameraControl.Main](../Cgf.CameraControl.Main/Readme.md)) throuth a web interface (either a REST API or a Websocket) and provides them via a serial port (to be used by [Cgf.CameraControl.CameraController](../Cgf.CameraControl.CameraController)).
+C# Application that receives commands (e.g. from [Cgf.CameraControl.Main](../Cgf.CameraControl.Main)) throuth a web interface (either a REST API or a Websocket) and provides them via a serial port (to be used by [Cgf.CameraControl.CameraController](../Cgf.CameraControl.CameraController)).
 
 ## Quick start
 
@@ -12,7 +12,7 @@ Following steps are used to execute this application as a service on a Raspberry
   - create a installable package for Raspberry Pi OS by calling [`createPackage.sh -s path/to/compiled/app -v version.number [-d path/to/destination/folder]`](../AptPackage/CameraHost/createPackage.sh)
   - transfer the newly created package to the Raspberry Pi
   - install the package using `apt install path/to/package.deb`
-  - remember the IP Address of the device on which the package was installed (it's best to chose a fixed IP Address) so that it can be entered in the configuration file of [Cgf.CameraControl.Main](../Cgf.CameraControl.Main/Readme.md)
+  - remember the IP Address of the device on which the package was installed (it's best to chose a fixed IP Address) so that it can be entered in the configuration file of [Cgf.CameraControl.Main](../Cgf.CameraControl.Main)
 
 ## Troubleshooting
 
