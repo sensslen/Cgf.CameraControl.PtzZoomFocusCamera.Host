@@ -1,2 +1,12 @@
 # Cgf.CameraControl
-This project aims to provide a Rest Api for the Arduino based Camera Control and also an application that reads a game controller and forwards the commands to the rest api.
+
+This project consists of the components that can be used to control Cameras and a Video mixer using a gamepad in order to allow one operator for the whole System.
+
+## Components
+
+The System consists of different components that do each fulfill a dedicated purpose.
+| Component | Purpose |
+|-----------|---------|
+| [Cgf.Cameracontrol.Main](./Cgf.Cameracontrol.Main/Readme.md) | Software application that takes input form Gamepad(s) and allows to control Video Switchers and Cameras by sending the appropriate commands to each of these units. |
+| [CGF.CameraControl.CameraHost](./CGF.CameraControl.CameraHost) | Software application that provides a Rest API and a Websocket Api in order to receive commands for a video camera to execute. |
+| [CGF.CameraControl.CameraController](./CGF.CameraControl.CameraController) | Software application that asks an instance of [CGF.CameraControl.CameraHost](./CGF.CameraControl.CameraHost) what should be executed next and does all the heavy realtime lifting to move the camera to the desired state. |
