@@ -1,10 +1,7 @@
+import { JoyStickValue } from "./JoyStickValue";
+
 const Gamepad = require("node-gamepad");
 const interpolate = require("everpolate").linear;
-
-interface JoyStickValue {
-  x: number;
-  y: number;
-}
 
 export class logitechF310 {
   private pad: any;

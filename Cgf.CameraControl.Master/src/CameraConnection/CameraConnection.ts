@@ -42,9 +42,14 @@ export class CameraConnection {
         console.log("Current state: " + JSON.stringify(state));
       });*/
       this.socketConnection.onreconnected(() => {
-        this.setupRemote(() => this.transmitNextStateIfRequestedAndPossible());
+        this.setupRemote(() => {
+          this.canTransmit = true;
+          this.transmitNextStateIfRequestedAndPossible();
+        });
       });
-      this.socketConnection.onreconnecting;
+      this.socketConnection.onreconnecting(() => {
+        this.canTransmit = false;
+      });
       this.socketConnection
         .start()
         .then(() => {
