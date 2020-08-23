@@ -1,7 +1,7 @@
 import { State } from "../State";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
-import signalR from "@microsoft/signalr";
+import * as signalR from "@microsoft/signalr";
 import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
 enum ConnectionState {
@@ -23,7 +23,6 @@ export class CameraConnection {
   constructor(config: CameraConnectionConfig) {
     this.config = config;
     this.axios = axios.create({
-      url: config.ConnectionUrl,
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
       }),
@@ -39,13 +38,18 @@ export class CameraConnection {
 
   private initialConnect() {
     this.setupRemote(() => {
-      this.socketConnection.on("NewState", (state: State) => {
+      /*this.socketConnection.on("NewState", (state: State) => {
         console.log("Current state: " + JSON.stringify(state));
-      });
+      });*/
       this.socketConnection.onreconnected(() => {
-        this.setupRemote(() => this.transmitNextStateIfRequestedAndPossible());
+        this.setupRemote(() => {
+          this.canTransmit = true;
+          this.transmitNextStateIfRequestedAndPossible();
+        });
       });
-      this.socketConnection.onreconnecting;
+      this.socketConnection.onreconnecting(() => {
+        this.canTransmit = false;
+      });
       this.socketConnection
         .start()
         .then(() => {
@@ -65,7 +69,7 @@ export class CameraConnection {
   private setupRemote(onComplete: () => void) {
     this.connectionState = ConnectionState.Connecting;
     this.axios
-      .get("/pantiltzoom/connections")
+      .get(this.config.ConnectionUrl + "/pantiltzoom/connections")
       .then((response) => {
         if (!response.data.includes(this.config.ConnectionPort)) {
           console.log(
@@ -79,7 +83,10 @@ export class CameraConnection {
           connected: true,
         };
         this.axios
-          .put("/pantiltzoom/connection", connection)
+          .put(
+            this.config.ConnectionUrl + "/pantiltzoom/connection",
+            connection
+          )
           .then(() => {
             onComplete();
           })
@@ -134,8 +141,8 @@ export class CameraConnection {
           if (!updateSuccessful) {
             console.log("state update failure returned - retrying");
             this.shouldTransmitState = true;
-            this.transmitNextStateIfRequestedAndPossible();
           }
+          this.transmitNextStateIfRequestedAndPossible();
         })
         .catch((error) => {
           this.shouldTransmitState = true;

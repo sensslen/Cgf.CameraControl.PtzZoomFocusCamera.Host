@@ -14,12 +14,28 @@ export class GameController {
     switch (config.ControllerType) {
       case "logitech/gamepadf310":
         new logitechF310(
-          this.onPan,
-          this.onTilt,
-          this.onZoom,
-          this.onFocus,
-          this.advanceCamera,
-          this.toggleAutofocus
+          (pan: number) => {
+            this.state.pan = pan;
+            this.cameraConnections[this.currentConnection].setState(this.state);
+          },
+          (tilt: number) => {
+            this.state.tilt = tilt;
+            this.cameraConnections[this.currentConnection].setState(this.state);
+          },
+          (zoom: number) => {
+            this.state.zoom = zoom;
+            this.cameraConnections[this.currentConnection].setState(this.state);
+          },
+          (focus: number) => {
+            this.state.focus = focus;
+            this.cameraConnections[this.currentConnection].setState(this.state);
+          },
+          (advance: number) => {
+            this.changeConnection(this.currentConnection + advance);
+          },
+          () => {
+            this.cameraConnections[this.currentConnection].toggleAutofocus();
+          }
         );
         break;
       default:
@@ -29,34 +45,6 @@ export class GameController {
     config.CameraConnections.forEach((c) => {
       this.cameraConnections.push(new CameraConnection(c));
     });
-  }
-
-  onPan(pan: number) {
-    this.state.pan = pan;
-    this.cameraConnections[this.currentConnection].setState(this.state);
-  }
-
-  onTilt(tilt: number) {
-    this.state.tilt = tilt;
-    this.cameraConnections[this.currentConnection].setState(this.state);
-  }
-
-  onZoom(zoom: number) {
-    this.state.zoom = zoom;
-    this.cameraConnections[this.currentConnection].setState(this.state);
-  }
-
-  onFocus(focus: number) {
-    this.state.focus = focus;
-    this.cameraConnections[this.currentConnection].setState(this.state);
-  }
-
-  advanceCamera(advance: number) {
-    this.changeConnection(this.currentConnection + advance);
-  }
-
-  toggleAutofocus() {
-    this.cameraConnections[this.currentConnection].toggleAutofocus();
   }
 
   changeConnection(nextConnection: number) {

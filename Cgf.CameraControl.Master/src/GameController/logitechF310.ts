@@ -1,10 +1,7 @@
+import { JoyStickValue } from "./JoyStickValue";
+
 const Gamepad = require("node-gamepad");
 const interpolate = require("everpolate").linear;
-
-interface JoyStickValue {
-  x: number;
-  y: number;
-}
 
 export class logitechF310 {
   private pad: any;
@@ -30,7 +27,7 @@ export class logitechF310 {
     this.pad = new Gamepad("logitech/gamepadf310");
     this.pad.connect();
 
-    this.pad.on("right:move", (value: JoyStickValue) => {
+    this.pad.on("left:move", (value: JoyStickValue) => {
       var pan = interpolate(
         value.x,
         this.moveInterpolation[0],
@@ -42,10 +39,10 @@ export class logitechF310 {
         this.moveInterpolation[0],
         this.moveInterpolation[1]
       )[0];
-      onTilt(Math.round(tilt));
+      onTilt(-Math.round(tilt));
     });
 
-    this.pad.on("left:move", (value: JoyStickValue) => {
+    this.pad.on("right:move", (value: JoyStickValue) => {
       onZoom(Math.round((-value.y + 127) / 16));
       onFocus(Math.round((value.x - 127) / 200));
     });
