@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CGF.CameraControl.Provider", "CGF.CameraControl.Provider\CGF.CameraControl.Provider.csproj", "{60579FF3-32BE-4B66-9D44-47FE2D29730B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CGF.CameraControl.CameraHost", "CGF.CameraControl.CameraHost.csproj", "{60579FF3-32BE-4B66-9D44-47FE2D29730B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

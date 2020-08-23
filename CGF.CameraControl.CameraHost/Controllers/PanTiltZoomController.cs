@@ -1,12 +1,12 @@
-﻿using CGF.CameraControl.Provider.Models;
-using CGF.CameraControl.Provider.Services;
+﻿using CGF.CameraControl.CameraHost.Models;
+using CGF.CameraControl.CameraHost.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CGF.CameraControl.Provider.Controllers
+namespace CGF.CameraControl.CameraHost.Controllers
 {
     [ApiController]
     [Route("[controller]")]

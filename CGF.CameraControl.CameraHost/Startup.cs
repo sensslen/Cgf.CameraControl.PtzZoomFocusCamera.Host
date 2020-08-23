@@ -1,12 +1,12 @@
-using CGF.CameraControl.Provider.Hubs;
-using CGF.CameraControl.Provider.Services;
+using CGF.CameraControl.CameraHost.Hubs;
+using CGF.CameraControl.CameraHost.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CGF.CameraControl.Provider
+namespace CGF.CameraControl.CameraHost
 {
     public class Startup
     {

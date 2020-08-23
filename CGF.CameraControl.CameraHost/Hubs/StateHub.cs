@@ -1,9 +1,9 @@
-﻿using CGF.CameraControl.Provider.Models;
-using CGF.CameraControl.Provider.Services;
+﻿using CGF.CameraControl.CameraHost.Models;
+using CGF.CameraControl.CameraHost.Services;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace CGF.CameraControl.Provider.Hubs
+namespace CGF.CameraControl.CameraHost.Hubs
 {
     public class StateHub : Hub
     {

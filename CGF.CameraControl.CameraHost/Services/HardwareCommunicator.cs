@@ -1,4 +1,4 @@
-﻿using CGF.CameraControl.Provider.Models;
+﻿using CGF.CameraControl.CameraHost.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CGF.CameraControl.Provider.Services
+namespace CGF.CameraControl.CameraHost.Services
 {
     public class HardwareCommunicator : IHardwareCommunicator, IDisposable
     {
