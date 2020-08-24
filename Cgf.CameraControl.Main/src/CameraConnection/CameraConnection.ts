@@ -78,7 +78,7 @@ export class CameraConnection {
           console.log("Available Ports:" + response.data);
           process.exit();
         }
-        var connection = {
+        let connection = {
           connectionName: this.config.ConnectionPort,
           connected: true,
         };
