@@ -28,13 +28,13 @@ export class logitechF310 {
     this.pad.connect();
 
     this.pad.on("left:move", (value: JoyStickValue) => {
-      var pan = interpolate(
+      let pan = interpolate(
         value.x,
         this.moveInterpolation[0],
         this.moveInterpolation[1]
       )[0];
       onPan(Math.round(pan));
-      var tilt = interpolate(
+      let tilt = interpolate(
         value.y,
         this.moveInterpolation[0],
         this.moveInterpolation[1]

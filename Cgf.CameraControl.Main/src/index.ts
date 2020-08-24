@@ -4,7 +4,7 @@ import Dictionary from "./Dictionary/Dictionary";
 
 import { default as config } from "./config.json";
 
-var atemInstances = new Dictionary<AtemConnection>();
+let atemInstances = new Dictionary<AtemConnection>();
 config.AtemConnections.forEach((c) => {
   atemInstances.add(c.identifier, new AtemConnection(c));
 });
