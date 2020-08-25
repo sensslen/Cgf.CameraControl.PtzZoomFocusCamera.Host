@@ -113,35 +113,17 @@ export class CameraConnection {
     if (this.connectionState != ConnectionState.Connected) {
       return;
     }
-    if (this.shouldTransmitAutofocusToggle) {
-      this.canTransmit = false;
-      this.shouldTransmitAutofocusToggle = false;
-      this.socketConnection
-        .invoke("ToggleAutofocus")
-        .then((updateSuccessful: boolean) => {
-          this.canTransmit = true;
-          if (!updateSuccessful) {
-            console.log("state update failure returned - retrying");
-            this.shouldTransmitAutofocusToggle = true;
-            this.transmitNextStateIfRequestedAndPossible();
-          }
-        })
-        .catch((error) => {
-          this.shouldTransmitAutofocusToggle = true;
-          console.log("toggle autofocus transmission error:");
-          console.log("error:" + error);
-        });
-    } else if (this.shouldTransmitState) {
+    if (this.shouldTransmitState) {
       this.canTransmit = false;
       this.shouldTransmitState = false;
       this.socketConnection
         .invoke("SetState", this.currentState)
         .then((updateSuccessful: boolean) => {
-          this.canTransmit = true;
           if (!updateSuccessful) {
             console.log("state update failure returned - retrying");
             this.shouldTransmitState = true;
           }
+          this.canTransmit = true;
           this.transmitNextStateIfRequestedAndPossible();
         })
         .catch((error) => {
@@ -160,7 +142,6 @@ export class CameraConnection {
 
   toggleAutofocus() {
     this.shouldTransmitAutofocusToggle = true;
-    this.transmitNextStateIfRequestedAndPossible();
   }
 
   printConnection() {
