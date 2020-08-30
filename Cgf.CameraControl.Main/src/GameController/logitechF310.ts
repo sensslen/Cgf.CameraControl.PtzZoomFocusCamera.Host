@@ -1,13 +1,13 @@
 import { JoyStickValue } from "./JoyStickValue";
 
 const Gamepad = require("node-gamepad");
-const interpolate = require("everpolate").polynomial;
+const interpolate = require("everpolate").linear;
 
 export class logitechF310 {
   private pad: any;
   private readonly moveInterpolation: number[][] = [
-    [0,127,128,255],
-    [255, 0,0, -255],
+    [0, 63, 127, 128, 172, 255],
+    [255, 70, 0, 0, -70, -255],
   ];
 
   constructor(
