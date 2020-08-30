@@ -349,3 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 Cgf.CameraControl.Master/build/
+Cgf.CameraControl.Main/build/
