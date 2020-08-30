@@ -42,12 +42,17 @@ export class CameraConnection {
         console.log("Current state: " + JSON.stringify(state));
       });*/
       this.socketConnection.onreconnected(() => {
+        console.log(`reconnect successful (${this.config.ConnectionUrl})`);
         this.setupRemote(() => {
           this.canTransmit = true;
+          this.connectionState = ConnectionState.Connected;
           this.transmitNextStateIfRequestedAndPossible();
         });
       });
       this.socketConnection.onreconnecting(() => {
+        console.log(
+          `connection error (${this.config.ConnectionUrl}) - trying automatic reconnect`
+        );
         this.canTransmit = false;
       });
       this.socketConnection
