@@ -4,17 +4,11 @@ import https from "https";
 import * as signalR from "@microsoft/signalr";
 import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
-enum ConnectionState {
-  NotConnected,
-  Connecting,
-  Connected,
-}
-
 export class CameraConnection {
   private shouldTransmitState: boolean = false;
   private shouldTransmitAutofocusToggle: boolean = false;
   private canTransmit: boolean = false;
-  private connectionState: ConnectionState = ConnectionState.NotConnected;
+  private connected= false;
   private readonly config: CameraConnectionConfig;
   private readonly axios: AxiosInstance;
   private socketConnection: signalR.HubConnection;
@@ -44,26 +38,21 @@ export class CameraConnection {
       this.socketConnection.onreconnected(() => {
         console.log(`reconnect successful (${this.config.ConnectionUrl})`);
         this.setupRemote(() => {
-          this.canTransmit = true;
-          this.connectionState = ConnectionState.Connected;
-          this.transmitNextStateIfRequestedAndPossible();
+          this.connectionSuccessfullyEstablished();
         });
       });
       this.socketConnection.onreconnecting(() => {
         console.log(
           `connection error (${this.config.ConnectionUrl}) - trying automatic reconnect`
         );
-        this.canTransmit = false;
+        this.connected = false;
       });
       this.socketConnection
         .start()
         .then(() => {
-          this.canTransmit = true;
-          this.connectionState = ConnectionState.Connected;
-          this.transmitNextStateIfRequestedAndPossible();
+          this.connectionSuccessfullyEstablished();
         })
         .catch((error) => {
-          this.connectionState = ConnectionState.NotConnected;
           console.log("Socket connection setup failed.");
           console.log("error:" + error);
           this.initialConnect();
@@ -71,8 +60,13 @@ export class CameraConnection {
     });
   }
 
+  private connectionSuccessfullyEstablished() {
+    this.canTransmit = true;
+    this.connected = true;
+    this.transmitNextStateIfRequestedAndPossible();
+  }
+
   private setupRemote(onComplete: () => void) {
-    this.connectionState = ConnectionState.Connecting;
     this.axios
       .get(this.config.ConnectionUrl + "/pantiltzoom/connections")
       .then((response) => {
@@ -106,7 +100,6 @@ export class CameraConnection {
       .catch((error) => {
         console.log("Failed to connect:" + this.config.ConnectionUrl);
         console.log("error:" + error);
-        this.connectionState = ConnectionState.NotConnected;
         this.setupRemote(onComplete);
       });
   }
@@ -115,7 +108,7 @@ export class CameraConnection {
     if (!this.canTransmit) {
       return;
     }
-    if (this.connectionState != ConnectionState.Connected) {
+    if (!this.connected) {
       return;
     }
     if (this.shouldTransmitState) {
