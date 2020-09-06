@@ -4,17 +4,11 @@ import https from "https";
 import * as signalR from "@microsoft/signalr";
 import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
-enum ConnectionState {
-  NotConnected,
-  Connecting,
-  Connected,
-}
-
 export class CameraConnection {
   private shouldTransmitState: boolean = false;
   private shouldTransmitAutofocusToggle: boolean = false;
   private canTransmit: boolean = false;
-  private connectionState: ConnectionState = ConnectionState.NotConnected;
+  private connected= false;
   private readonly config: CameraConnectionConfig;
   private readonly axios: AxiosInstance;
   private socketConnection: signalR.HubConnection;
@@ -42,23 +36,23 @@ export class CameraConnection {
         console.log("Current state: " + JSON.stringify(state));
       });*/
       this.socketConnection.onreconnected(() => {
+        console.log(`reconnect successful (${this.config.ConnectionUrl})`);
         this.setupRemote(() => {
-          this.canTransmit = true;
-          this.transmitNextStateIfRequestedAndPossible();
+          this.connectionSuccessfullyEstablished();
         });
       });
       this.socketConnection.onreconnecting(() => {
-        this.canTransmit = false;
+        console.log(
+          `connection error (${this.config.ConnectionUrl}) - trying automatic reconnect`
+        );
+        this.connected = false;
       });
       this.socketConnection
         .start()
         .then(() => {
-          this.canTransmit = true;
-          this.connectionState = ConnectionState.Connected;
-          this.transmitNextStateIfRequestedAndPossible();
+          this.connectionSuccessfullyEstablished();
         })
         .catch((error) => {
-          this.connectionState = ConnectionState.NotConnected;
           console.log("Socket connection setup failed.");
           console.log("error:" + error);
           this.initialConnect();
@@ -66,8 +60,13 @@ export class CameraConnection {
     });
   }
 
+  private connectionSuccessfullyEstablished() {
+    this.canTransmit = true;
+    this.connected = true;
+    this.transmitNextStateIfRequestedAndPossible();
+  }
+
   private setupRemote(onComplete: () => void) {
-    this.connectionState = ConnectionState.Connecting;
     this.axios
       .get(this.config.ConnectionUrl + "/pantiltzoom/connections")
       .then((response) => {
@@ -78,7 +77,7 @@ export class CameraConnection {
           console.log("Available Ports:" + response.data);
           process.exit();
         }
-        var connection = {
+        let connection = {
           connectionName: this.config.ConnectionPort,
           connected: true,
         };
@@ -101,7 +100,6 @@ export class CameraConnection {
       .catch((error) => {
         console.log("Failed to connect:" + this.config.ConnectionUrl);
         console.log("error:" + error);
-        this.connectionState = ConnectionState.NotConnected;
         this.setupRemote(onComplete);
       });
   }
@@ -110,38 +108,20 @@ export class CameraConnection {
     if (!this.canTransmit) {
       return;
     }
-    if (this.connectionState != ConnectionState.Connected) {
+    if (!this.connected) {
       return;
     }
-    if (this.shouldTransmitAutofocusToggle) {
-      this.canTransmit = false;
-      this.shouldTransmitAutofocusToggle = false;
-      this.socketConnection
-        .invoke("ToggleAutofocus")
-        .then((updateSuccessful: boolean) => {
-          this.canTransmit = true;
-          if (!updateSuccessful) {
-            console.log("state update failure returned - retrying");
-            this.shouldTransmitAutofocusToggle = true;
-            this.transmitNextStateIfRequestedAndPossible();
-          }
-        })
-        .catch((error) => {
-          this.shouldTransmitAutofocusToggle = true;
-          console.log("toggle autofocus transmission error:");
-          console.log("error:" + error);
-        });
-    } else if (this.shouldTransmitState) {
+    if (this.shouldTransmitState) {
       this.canTransmit = false;
       this.shouldTransmitState = false;
       this.socketConnection
         .invoke("SetState", this.currentState)
         .then((updateSuccessful: boolean) => {
-          this.canTransmit = true;
           if (!updateSuccessful) {
             console.log("state update failure returned - retrying");
             this.shouldTransmitState = true;
           }
+          this.canTransmit = true;
           this.transmitNextStateIfRequestedAndPossible();
         })
         .catch((error) => {
@@ -160,7 +140,6 @@ export class CameraConnection {
 
   toggleAutofocus() {
     this.shouldTransmitAutofocusToggle = true;
-    this.transmitNextStateIfRequestedAndPossible();
   }
 
   printConnection() {
