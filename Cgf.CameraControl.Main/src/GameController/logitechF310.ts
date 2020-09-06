@@ -6,8 +6,8 @@ const interpolate = require("everpolate").linear;
 export class logitechF310 {
   private pad: any;
   private readonly moveInterpolation: number[][] = [
-    [0, 50, 115, 116, 139, 140, 205, 255],
-    [255, 50, 15, 0, 0, -15, -50, -255],
+    [0, 63, 127, 128, 172, 255],
+    [255, 70, 0, 0, -70, -255],
   ];
 
   constructor(
