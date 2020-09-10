@@ -18,12 +18,10 @@ Script to create an apt Package for the Cgf.CameraControl.Provider package
 
 Options:
     -s|--source                 Provide a folder where the compiled source files are located.
-	-v|--version                Provide a version number that should be associated with the built 
+    -v|--version                Provide a version number that should be associated with the built 
                                 package. If not provided, a version number will be created using
                                 git revision.
-    [-o|--output-location]      Select the folder to which the modified image should be stored to. 
-                                If this parameter is used, the original file is left intact and a 
-                                new one will be placed to the specified location.
+    [-o|--output-location]      Select the folder to which the generated package should be placed to
     [-c|--create-output-folder] When specified, the output folder will be automatically created
 
     [-h|--help]                 Show this help.
