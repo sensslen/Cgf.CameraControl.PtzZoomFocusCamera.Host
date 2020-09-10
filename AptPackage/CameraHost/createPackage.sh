@@ -18,9 +18,6 @@ Script to create an apt Package for the Cgf.CameraControl.Provider package
 
 Options:
     -s|--source                 Provide a folder where the compiled source files are located.
-    -v|--version                Provide a version number that should be associated with the built 
-                                package. If not provided, a version number will be created using
-                                git revision.
     [-o|--output-location]      Select the folder to which the generated package should be placed to
     [-c|--create-output-folder] When specified, the output folder will be automatically created
 
@@ -43,22 +40,11 @@ error() {
 
 output_location="$HOME"
 
-pushd $SCRIPT_LOCATION
-VERSION="-$(git rev-parse HEAD)"
-if ! git diff-index --quiet HEAD --; then
-    VERSION="$VERSION-dirty"
-fi
-popd
-
 CREATE_OUTPUT_FOLDER="false"
 while (("$#")); do
 	case "$1" in
 	-o | --output-location)
 		output_location=$(get_path $2)
-		shift 2
-		;;
-	-v | --version)
-		VERSION=$2
 		shift 2
 		;;
 	-s | --source)
@@ -89,10 +75,8 @@ while (("$#")); do
 done
 
 pushd $SCRIPT_LOCATION
-VERSION="$VERSION-$(git rev-parse HEAD)"
-if ! git diff-index --quiet HEAD --; then
-    VERSION="$VERSION-dirty"
-fi
+VERSION="$(git describe --dirty)"
+echo using version number: $VERSION
 popd
 
 if ! [ -d "$output_location" ]; then
