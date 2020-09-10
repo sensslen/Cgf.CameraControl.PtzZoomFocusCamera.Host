@@ -1,41 +1,41 @@
 import { logitechF310 } from "./logitechF310";
-import { CameraConnection } from "../CameraConnection/CameraConnection";
+import { CameraConnection } from "../ImageConnection/CameraConnection/CameraConnection";
 import { State } from "../State";
 import { ControllerConfig } from "./ControllerConfig";
 import { AtemConnection } from "../AtemConnection/AtemConnection";
+import { Atem } from "atem-connection";
 
 export class GameController {
   private state: State;
-  private cameraConnections: Array<CameraConnection> = [];
-  private currentConnection: number = 0;
+  private cameraConnections = new Map<number, CameraConnection>();
+  private currentInputSelected: number = 0;
+  private AtemMixEffectBlock: number;
 
-  constructor(config: ControllerConfig, atem: AtemConnection) {
+  constructor(config: ControllerConfig, private atem: AtemConnection) {
     this.state = new State();
     switch (config.ControllerType) {
       case "logitech/gamepadf310":
         new logitechF310(
           (pan: number) => {
             this.state.pan = pan;
-            this.cameraConnections[this.currentConnection].setState(this.state);
+            this.transmitState(this.state, this.currentInputSelected);
           },
           (tilt: number) => {
             this.state.tilt = tilt;
-            this.cameraConnections[this.currentConnection].setState(this.state);
+            this.transmitState(this.state, this.currentInputSelected);
           },
           (zoom: number) => {
             this.state.zoom = zoom;
-            this.cameraConnections[this.currentConnection].setState(this.state);
+            this.transmitState(this.state, this.currentInputSelected);
           },
           (focus: number) => {
             this.state.focus = focus;
-            this.cameraConnections[this.currentConnection].setState(this.state);
+            this.transmitState(this.state, this.currentInputSelected);
           },
           (advance: number) => {
-            this.changeConnection(this.currentConnection + advance);
+            this.changeConnection(advance);
           },
-          () => {
-            this.cameraConnections[this.currentConnection].toggleAutofocus();
-          }
+          () => {}
         );
         break;
       default:
@@ -43,22 +43,28 @@ export class GameController {
         process.exit();
     }
     config.CameraConnections.forEach((c) => {
-      this.cameraConnections.push(new CameraConnection(c));
+      this.cameraConnections.set(c.AtemInputNumber, new CameraConnection(c));
     });
+
+    this.AtemMixEffectBlock = config.AtemMixEffectBlock;
+    this.atem.onPreviewStateUpdate(
+      this.AtemMixEffectBlock,
+      (preview: number, isProgram: boolean) =>
+        this.selectedConnectionChanged(preview, isProgram)
+    );
   }
 
-  changeConnection(nextConnection: number) {
-    nextConnection = this.mod(nextConnection, this.cameraConnections.length);
-
-    if (this.currentConnection != nextConnection) {
-      this.cameraConnections[this.currentConnection].setState(new State());
-      this.currentConnection = nextConnection;
-      this.cameraConnections[this.currentConnection].setState(this.state);
-      this.cameraConnections[this.currentConnection].printConnection();
+  transmitState(transmitState: State, connectionNumber: number) {
+    if (this.cameraConnections.has(connectionNumber)) {
+      this.cameraConnections.get(connectionNumber)?.setState(transmitState);
     }
   }
 
-  mod(n: number, m: number) {
-    return ((n % m) + m) % m;
+  changeConnection(advance: number) {
+    this.atem.changePreview(this.AtemMixEffectBlock, advance);
+  }
+
+  selectedConnectionChanged(preview: number, isProgram: boolean): void {
+    this.currentInputSelected = preview;
   }
 }

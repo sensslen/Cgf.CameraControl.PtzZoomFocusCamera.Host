@@ -6,9 +6,8 @@ import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
 export class CameraConnection {
   private shouldTransmitState: boolean = false;
-  private shouldTransmitAutofocusToggle: boolean = false;
   private canTransmit: boolean = false;
-  private connected= false;
+  private connected = false;
   private readonly config: CameraConnectionConfig;
   private readonly axios: AxiosInstance;
   private socketConnection: signalR.HubConnection;
@@ -136,10 +135,6 @@ export class CameraConnection {
     this.currentState = state;
     this.shouldTransmitState = true;
     this.transmitNextStateIfRequestedAndPossible();
-  }
-
-  toggleAutofocus() {
-    this.shouldTransmitAutofocusToggle = true;
   }
 
   printConnection() {

@@ -1,4 +1,5 @@
-export class AtemConnectionConfig {
-  IP: string = "";
-  identifier: string = "";
+export interface AtemConnectionConfig {
+  IP: string;
+  identifier: string;
+  multiviewer: Map<number, number>;
 }
