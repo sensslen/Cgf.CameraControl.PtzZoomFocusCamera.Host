@@ -13,6 +13,10 @@ export class CameraConnection {
   private socketConnection: signalR.HubConnection;
   private currentState: State = new State();
 
+  public get AtemImputNumber(): number {
+    return this.config.AtemInputNumber;
+  }
+
   constructor(config: CameraConnectionConfig) {
     this.config = config;
     this.axios = axios.create({

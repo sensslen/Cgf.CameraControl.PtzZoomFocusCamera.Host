@@ -54,39 +54,7 @@ export class AtemConnection {
     emitter?.on("previewUpdate", callback);
   }
 
-  changePreview(me: number, advance: number) {
-    if (this.atem.state !== undefined) {
-      const meState = this.atem.state.video.mixEffects[me];
-      if (meState !== undefined) {
-        const selectedInput = meState.previewInput;
-        const multiviewIndex = this.multiviewmap.get(me);
-        if (multiviewIndex !== undefined) {
-          let multiviewState = this.atem.state.settings.multiViewers[
-            multiviewIndex
-          ];
-          if (multiviewState !== undefined) {
-            let currentWindowIndex = -1;
-            multiviewState.windows.forEach((window) => {
-              if (window !== undefined) {
-                if (window.source === selectedInput) {
-                  currentWindowIndex = window.windowIndex;
-                }
-              }
-            });
-            const windowToSelect =
-              multiviewState.windows[this.mod(currentWindowIndex + advance, 8)];
-            if (windowToSelect !== undefined) {
-              this.atem.changePreviewInput(windowToSelect.source, me);
-              return;
-            }
-          }
-        }
-        this.atem.changePreviewInput(selectedInput + advance, me);
-      }
-    }
-  }
-
-  mod(n: number, m: number): number {
-    return ((n % m) + m) % m;
+  changePreview(me: number, index: number) {
+    this.atem.changePreviewInput(index, me);
   }
 }

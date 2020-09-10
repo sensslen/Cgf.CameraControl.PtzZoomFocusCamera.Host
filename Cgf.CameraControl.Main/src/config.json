@@ -12,7 +12,6 @@
       "AtemMixEffectBlock": 2,
       "ImageConnections": [
         {
-          "Type": "Cam",
           "ConnectionName": "Cam1",
           "ConnectionUrl": "http://localhost:5000",
           "ConnectionPort": "COM6",
