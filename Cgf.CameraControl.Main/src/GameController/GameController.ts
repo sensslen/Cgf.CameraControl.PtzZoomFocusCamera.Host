@@ -72,12 +72,21 @@ export class GameController {
   }
 
   selectedConnectionChanged(preview: number, isProgram: boolean): void {
+    if (this.currentCameraConnection !== undefined) {
+      if (this.currentCameraConnection.index === preview) {
+        return;
+      }
+    }
+
     this.currentCameraConnection = undefined;
     this.cameraConnections.forEach((connection, index) => {
-      if (connection.AtemImputNumber == preview) {
+      if (connection.AtemImputNumber === preview) {
+        connection.printConnection();
         this.currentCameraConnection = { index, connection };
+        return;
       }
     });
+    console.log("Selected input that is not a camera");
   }
 
   mod(n: number, m: number) {

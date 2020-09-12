@@ -2,14 +2,14 @@
   "AtemConnections": [
     {
       "identifier": "me4",
-      "IP": "192.168.1.123"
+      "IP": "192.168.1.111"
     }
   ],
   "Controllers": [
     {
       "ControllerType": "logitech/gamepadf310",
       "AtemConnection": "me4",
-      "AtemMixEffectBlock": 1,
+      "AtemMixEffectBlock": 0,
       "CameraConnections": [
         {
           "ConnectionName": "Cam1",
