@@ -21,19 +21,19 @@
           "ConnectionName": "Cam2",
           "ConnectionUrl": "http://192.168.1.140:5001",
           "ConnectionPort": "/dev/ttyACM0",
-          "AtemInputNumber": 1
+          "AtemInputNumber": 2
         },
         {
           "ConnectionName": "Cam3",
           "ConnectionUrl": "http://192.168.1.141:5001",
           "ConnectionPort": "/dev/ttyACM0",
-          "AtemInputNumber": 1
+          "AtemInputNumber": 3
         },
         {
           "ConnectionName": "Cam4",
           "ConnectionUrl": "http://192.168.1.98:5001",
           "ConnectionPort": "/dev/ttyACM0",
-          "AtemInputNumber": 1
+          "AtemInputNumber": 4
         }
       ]
     }
