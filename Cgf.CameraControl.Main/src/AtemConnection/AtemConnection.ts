@@ -12,7 +12,6 @@ export class AtemConnection {
     number,
     StrictEventEmitter<EventEmitter, MeEvents>
   > = new Map<number, StrictEventEmitter<EventEmitter, MeEvents>>();
-  private readonly multiviewmap: Map<number, number>;
   private readonly atem: Atem;
   constructor(config: AtemConnectionConfig) {
     this.atem = new Atem();
@@ -22,8 +21,6 @@ export class AtemConnection {
 
     this.atem.connect(config.IP);
 
-    this.multiviewmap = new Map<number, number>(config.multiviewer);
-
     this.atem.on("connected", () => {
       console.log("atem connection established (" + config.IP + ")");
     });
@@ -32,7 +29,6 @@ export class AtemConnection {
       state.video.mixEffects.forEach((state, index) => {
         if (state !== undefined) {
           var emitter = this.mixermap.get(index);
-
           emitter?.emit(
             "previewUpdate",
             state.previewInput,
@@ -56,5 +52,25 @@ export class AtemConnection {
 
   changePreview(me: number, index: number) {
     this.atem.changePreviewInput(index, me);
+  }
+
+  toggleKey(keyIndex: number, me: number) {
+    if (this.atem.state !== undefined) {
+      const meState = this.atem.state.video.mixEffects[me];
+      if (meState !== undefined) {
+        const keyState = meState.upstreamKeyers[keyIndex];
+        if (keyState !== undefined) {
+          this.atem.setUpstreamKeyerOnAir(!keyState.onAir, me, keyIndex);
+        }
+      }
+    }
+  }
+
+  cut(me: number) {
+    this.atem.cut(me);
+  }
+
+  auto(me: number) {
+    this.atem.autoTransition(me);
   }
 }

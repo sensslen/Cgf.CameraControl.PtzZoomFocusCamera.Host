@@ -37,7 +37,20 @@ export class GameController {
           (advance: number) => {
             this.changeConnection(advance);
           },
-          () => {}
+          () => {
+            this.atem.cut(config.AtemMixEffectBlock);
+          },
+          () => {
+            this.atem.auto(config.AtemMixEffectBlock);
+          },
+          (index: number) => {
+            if (config.AtemToggleKeyIndexes[index] !== undefined) {
+              this.atem.toggleKey(
+                config.AtemToggleKeyIndexes[index],
+                config.AtemMixEffectBlock
+              );
+            }
+          }
         );
         break;
       default:
@@ -72,12 +85,27 @@ export class GameController {
   }
 
   selectedConnectionChanged(preview: number, isProgram: boolean): void {
+    if (this.currentCameraConnection !== undefined) {
+      if (this.currentCameraConnection.connection.AtemImputNumber === preview) {
+        return;
+      }
+    }
+
     this.currentCameraConnection = undefined;
     this.cameraConnections.forEach((connection, index) => {
-      if (connection.AtemImputNumber == preview) {
+      if (connection.AtemImputNumber === preview) {
         this.currentCameraConnection = { index, connection };
       }
     });
+    this.printConnection();
+  }
+
+  printConnection() {
+    if (this.currentCameraConnection !== undefined) {
+      this.currentCameraConnection.connection.printConnection();
+    } else {
+      console.log("Selected input that is not a camera");
+    }
   }
 
   mod(n: number, m: number) {

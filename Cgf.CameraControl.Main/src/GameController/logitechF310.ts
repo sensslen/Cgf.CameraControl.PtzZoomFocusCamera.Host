@@ -1,4 +1,5 @@
 import { JoyStickValue } from "./JoyStickValue";
+import { CutCommand } from "atem-connection/dist/commands";
 
 const Gamepad = require("node-gamepad");
 const interpolate = require("everpolate").linear;
@@ -16,7 +17,9 @@ export class logitechF310 {
     onZoom: (value: number) => void,
     onFocus: (value: number) => void,
     selectCamera: (advance: number) => void,
-    toggleAutofocus: () => void,
+    cut: () => void,
+    auto: () => void,
+    enableKey: (index: number) => void,
     padSerialNumber?: string
   ) {
     if (!(padSerialNumber === undefined)) {
@@ -64,11 +67,19 @@ export class logitechF310 {
     });
 
     this.pad.on("RB:press", () => {
-      toggleAutofocus();
+      cut();
     });
 
-    this.pad.on("LB:press", () => {
-      toggleAutofocus();
+    this.pad.on("RT:press", () => {
+      auto();
+    });
+
+    this.pad.on("A:press", () => {
+      enableKey(0);
+    });
+
+    this.pad.on("B:press", () => {
+      enableKey(1);
     });
   }
 }
