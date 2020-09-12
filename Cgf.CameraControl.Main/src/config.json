@@ -10,7 +10,7 @@
       "ControllerType": "logitech/gamepadf310",
       "AtemConnection": "me4",
       "AtemMixEffectBlock": 2,
-      "ImageConnections": [
+      "CameraConnections": [
         {
           "ConnectionName": "Cam1",
           "ConnectionUrl": "http://localhost:5000",
