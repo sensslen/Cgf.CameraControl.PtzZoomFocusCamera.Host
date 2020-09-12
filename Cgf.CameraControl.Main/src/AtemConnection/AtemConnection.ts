@@ -53,4 +53,24 @@ export class AtemConnection {
   changePreview(me: number, index: number) {
     this.atem.changePreviewInput(index, me);
   }
+
+  toggleKey(keyIndex: number, me: number) {
+    if (this.atem.state !== undefined) {
+      const meState = this.atem.state.video.mixEffects[me];
+      if (meState !== undefined) {
+        const keyState = meState.upstreamKeyers[keyIndex];
+        if (keyState !== undefined) {
+          this.atem.setUpstreamKeyerOnAir(!keyState.onAir, me, keyIndex);
+        }
+      }
+    }
+  }
+
+  cut(me: number) {
+    this.atem.cut(me);
+  }
+
+  auto(me: number) {
+    this.atem.autoTransition(me);
+  }
 }

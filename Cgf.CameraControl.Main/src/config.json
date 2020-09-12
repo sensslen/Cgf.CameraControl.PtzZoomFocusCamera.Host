@@ -9,7 +9,8 @@
     {
       "ControllerType": "logitech/gamepadf310",
       "AtemConnection": "me4",
-      "AtemMixEffectBlock": 0,
+      "AtemMixEffectBlock": 1,
+      "AtemToggleKeyIndexes": [0, 1],
       "CameraConnections": [
         {
           "ConnectionName": "Cam1",

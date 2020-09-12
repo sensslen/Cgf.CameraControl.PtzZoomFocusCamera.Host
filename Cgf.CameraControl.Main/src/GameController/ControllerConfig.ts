@@ -2,5 +2,6 @@ import { CameraConnectionConfig } from "../CameraConnection/CameraConnectionConf
 export interface ControllerConfig {
   ControllerType: string;
   AtemMixEffectBlock: number;
+  AtemToggleKeyIndexes: Array<number>;
   CameraConnections: Array<CameraConnectionConfig>;
 }
