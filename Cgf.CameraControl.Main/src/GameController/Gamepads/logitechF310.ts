@@ -1,27 +1,24 @@
 import { JoyStickValue } from "./JoyStickValue";
-import { CutCommand } from "atem-connection/dist/commands";
+import { IGamePad, IGamepadEvents } from "./IGamePad";
+import { EventEmitter } from "events";
+import StrictEventEmitter from "strict-event-emitter-types";
 
 const Gamepad = require("node-gamepad");
 const interpolate = require("everpolate").linear;
 
-export class logitechF310 {
+export class logitechF310 implements IGamePad {
   private pad: any;
   private readonly moveInterpolation: number[][] = [
-    [0, 63, 127, 128, 172, 255],
-    [255, 70, 0, 0, -70, -255],
+    [0, 63, 31, 127, 128, 160, 172, 255],
+    [255, 70, 20, 0, 0, -20, -70, -255],
   ];
 
-  constructor(
-    onPan: (value: number) => void,
-    onTilt: (value: number) => void,
-    onZoom: (value: number) => void,
-    onFocus: (value: number) => void,
-    selectCamera: (advance: number) => void,
-    cut: () => void,
-    auto: () => void,
-    enableKey: (index: number) => void,
-    padSerialNumber?: string
-  ) {
+  keypadEvents$: StrictEventEmitter<
+    EventEmitter,
+    IGamepadEvents
+  > = new EventEmitter();
+
+  constructor(padSerialNumber?: string) {
     if (!(padSerialNumber === undefined)) {
       throw new Error(
         "Unfortunately identification of controllers by serial number is not yet supported"
@@ -36,50 +33,54 @@ export class logitechF310 {
         this.moveInterpolation[0],
         this.moveInterpolation[1]
       )[0];
-      onPan(Math.round(pan));
+      this.keypadEvents$.emit("pan", Math.round(pan));
       let tilt = interpolate(
         value.y,
         this.moveInterpolation[0],
         this.moveInterpolation[1]
       )[0];
-      onTilt(-Math.round(tilt));
+      this.keypadEvents$.emit("tilt", Math.round(tilt));
     });
 
     this.pad.on("right:move", (value: JoyStickValue) => {
-      onZoom(Math.round((-value.y + 127) / 16));
-      onFocus(Math.round((value.x - 127) / 200));
+      this.keypadEvents$.emit("zoom", Math.round((-value.y + 127) / 16));
+      this.keypadEvents$.emit("focus", Math.round((value.x - 127) / 200));
     });
 
     this.pad.on("dpadLeft:press", () => {
-      selectCamera(-1);
+      this.keypadEvents$.emit("inputChange", -1);
     });
 
     this.pad.on("dpadUp:press", () => {
-      selectCamera(-4);
+      this.keypadEvents$.emit("inputChange", -4);
     });
 
     this.pad.on("dpadRight:press", () => {
-      selectCamera(1);
+      this.keypadEvents$.emit("inputChange", 1);
     });
 
     this.pad.on("dpadDown:press", () => {
-      selectCamera(4);
+      this.keypadEvents$.emit("inputChange", 4);
     });
 
     this.pad.on("RB:press", () => {
-      cut();
+      this.keypadEvents$.emit("cut");
     });
 
     this.pad.on("RT:press", () => {
-      auto();
+      this.keypadEvents$.emit("auto");
     });
 
     this.pad.on("A:press", () => {
-      enableKey(0);
+      this.keypadEvents$.emit("keyToggle", 0);
     });
 
     this.pad.on("B:press", () => {
-      enableKey(1);
+      this.keypadEvents$.emit("keyToggle", 1);
     });
+  }
+
+  rumble(): void {
+    // This Gamepad does not provide rumbling - hence left empty
   }
 }

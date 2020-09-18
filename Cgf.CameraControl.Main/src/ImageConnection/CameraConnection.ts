@@ -2,23 +2,23 @@ import { State } from "../State";
 import axios, { AxiosInstance } from "axios";
 import https from "https";
 import * as signalR from "@microsoft/signalr";
+import { ImageConnectionConfig } from "./ImageConnectionConfig";
+import { AbstractImageConnection } from "./AbstractImageConnection";
 import { CameraConnectionConfig } from "./CameraConnectionConfig";
 
-export class CameraConnection {
+export class CameraConnection extends AbstractImageConnection {
   private shouldTransmitState: boolean = false;
   private canTransmit: boolean = false;
   private connected = false;
-  private readonly config: CameraConnectionConfig;
   private readonly axios: AxiosInstance;
   private socketConnection: signalR.HubConnection;
   private currentState: State = new State();
 
-  public get AtemImputNumber(): number {
-    return this.config.AtemInputNumber;
-  }
-
-  constructor(config: CameraConnectionConfig) {
-    this.config = config;
+  constructor(
+    config: ImageConnectionConfig,
+    private cameraConfig: CameraConnectionConfig
+  ) {
+    super(config);
     this.axios = axios.create({
       httpsAgent: new https.Agent({
         rejectUnauthorized: false,
@@ -27,7 +27,7 @@ export class CameraConnection {
 
     this.socketConnection = new signalR.HubConnectionBuilder()
       .withAutomaticReconnect()
-      .withUrl(this.config.ConnectionUrl + "/pantiltzoom/statehub")
+      .withUrl(this.cameraConfig.ConnectionUrl + "/pantiltzoom/statehub")
       .build();
 
     this.initialConnect();
@@ -39,14 +39,16 @@ export class CameraConnection {
         console.log("Current state: " + JSON.stringify(state));
       });*/
       this.socketConnection.onreconnected(() => {
-        console.log(`reconnect successful (${this.config.ConnectionUrl})`);
+        console.log(
+          `reconnect successful (${this.cameraConfig.ConnectionUrl})`
+        );
         this.setupRemote(() => {
           this.connectionSuccessfullyEstablished();
         });
       });
       this.socketConnection.onreconnecting(() => {
         console.log(
-          `connection error (${this.config.ConnectionUrl}) - trying automatic reconnect`
+          `connection error (${this.cameraConfig.ConnectionUrl}) - trying automatic reconnect`
         );
         this.connected = false;
       });
@@ -71,22 +73,22 @@ export class CameraConnection {
 
   private setupRemote(onComplete: () => void) {
     this.axios
-      .get(this.config.ConnectionUrl + "/pantiltzoom/connections")
+      .get(this.cameraConfig.ConnectionUrl + "/pantiltzoom/connections")
       .then((response) => {
-        if (!response.data.includes(this.config.ConnectionPort)) {
+        if (!response.data.includes(this.cameraConfig.ConnectionPort)) {
           console.log(
-            "Port:" + this.config.ConnectionPort + " is not available."
+            "Port:" + this.cameraConfig.ConnectionPort + " is not available."
           );
           console.log("Available Ports:" + response.data);
           process.exit();
         }
         let connection = {
-          connectionName: this.config.ConnectionPort,
+          connectionName: this.cameraConfig.ConnectionPort,
           connected: true,
         };
         this.axios
           .put(
-            this.config.ConnectionUrl + "/pantiltzoom/connection",
+            this.cameraConfig.ConnectionUrl + "/pantiltzoom/connection",
             connection
           )
           .then(() => {
@@ -94,14 +96,14 @@ export class CameraConnection {
           })
           .catch((error) => {
             console.log(
-              "Failed to connect to Port:" + this.config.ConnectionPort
+              "Failed to connect to Port:" + this.cameraConfig.ConnectionPort
             );
             console.log("error:" + error);
             process.exit();
           });
       })
       .catch((error) => {
-        console.log("Failed to connect:" + this.config.ConnectionUrl);
+        console.log("Failed to connect:" + this.cameraConfig.ConnectionUrl);
         console.log("error:" + error);
         this.setupRemote(onComplete);
       });
@@ -142,12 +144,6 @@ export class CameraConnection {
   }
 
   printConnection() {
-    console.log(
-      "selected Connection: " +
-        this.config.ConnectionName +
-        " (" +
-        this.config.ConnectionUrl +
-        ")"
-    );
+    this.printConnectionWithAdditionalInfo(this.cameraConfig.ConnectionUrl);
   }
 }

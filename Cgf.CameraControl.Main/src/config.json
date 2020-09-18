@@ -14,9 +14,15 @@
       "CameraConnections": [
         {
           "ConnectionName": "Cam1",
-          "ConnectionUrl": "http://localhost:5000",
-          "ConnectionPort": "COM6",
-          "AtemInputNumber": 1
+          "AtemInputNumber": 1,
+          "CgfCameraConnection": {
+            "ConnectionUrl": "http://localhost:5000",
+            "ConnectionPort": "COM6"
+          }
+        },
+        {
+          "ConnectionName": "Input2",
+          "AtemInputNumber": 2
         }
       ]
     }

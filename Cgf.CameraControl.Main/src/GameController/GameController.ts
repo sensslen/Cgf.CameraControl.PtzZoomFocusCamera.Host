@@ -1,72 +1,80 @@
-import { logitechF310 } from "./logitechF310";
-import { CameraConnection } from "../CameraConnection/CameraConnection";
+import { ImageConnectionFactory } from "../ImageConnection/ImageConnectionFactory";
 import { State } from "../State";
 import { ControllerConfig } from "./ControllerConfig";
 import { AtemConnection } from "../AtemConnection/AtemConnection";
+import { IImageConnection } from "../ImageConnection/IImageConnection";
+import { GamepadFactory } from "./Gamepads/GamepadFactory";
+import { IGamePad } from "./Gamepads/IGamePad";
 
 export class GameController {
   private state: State;
-  private cameraConnections: Array<CameraConnection> = [];
+  private cameraConnections: Array<IImageConnection> = [];
   private currentCameraConnection?: {
     index: number;
-    connection: CameraConnection;
+    connection: IImageConnection;
   };
   private AtemMixEffectBlock: number;
+  private pad: IGamePad;
 
   constructor(config: ControllerConfig, private atem: AtemConnection) {
     this.state = new State();
-    switch (config.ControllerType) {
-      case "logitech/gamepadf310":
-        new logitechF310(
-          (pan: number) => {
-            this.state.pan = pan;
-            this.currentCameraConnection?.connection.setState(this.state);
-          },
-          (tilt: number) => {
-            this.state.tilt = tilt;
-            this.currentCameraConnection?.connection.setState(this.state);
-          },
-          (zoom: number) => {
-            this.state.zoom = zoom;
-            this.currentCameraConnection?.connection.setState(this.state);
-          },
-          (focus: number) => {
-            this.state.focus = focus;
-            this.currentCameraConnection?.connection.setState(this.state);
-          },
-          (advance: number) => {
-            this.changeConnection(advance);
-          },
-          () => {
-            this.atem.cut(config.AtemMixEffectBlock);
-          },
-          () => {
-            this.atem.auto(config.AtemMixEffectBlock);
-          },
-          (index: number) => {
-            if (config.AtemToggleKeyIndexes[index] !== undefined) {
-              this.atem.toggleKey(
-                config.AtemToggleKeyIndexes[index],
-                config.AtemMixEffectBlock
-              );
-            }
-          }
-        );
-        break;
-      default:
-        console.log(`${config.ControllerType} not yet supported`);
-        process.exit();
-    }
+
+    this.pad = GamepadFactory.getGamepad(config);
+    this.connectGamepad(config);
+
     config.CameraConnections.forEach((c) => {
-      this.cameraConnections.push(new CameraConnection(c));
+      this.cameraConnections.push(ImageConnectionFactory.GetImageConnection(c));
     });
 
     this.AtemMixEffectBlock = config.AtemMixEffectBlock;
-    this.atem.onPreviewStateUpdate(
-      this.AtemMixEffectBlock,
-      (preview: number, isProgram: boolean) =>
+    this.atem
+      .previewStateUpdateEmitterGet(this.AtemMixEffectBlock)
+      .on("previewUpdate", (preview: number, isProgram: boolean) =>
         this.selectedConnectionChanged(preview, isProgram)
-    );
+      );
+  }
+
+  private connectGamepad(config: ControllerConfig) {
+    this.pad.keypadEvents$.on("pan", (pan) => {
+      this.state.pan = pan;
+      this.currentCameraConnection?.connection.setState(this.state);
+    });
+
+    this.pad.keypadEvents$.on("tilt", (tilt) => {
+      this.state.tilt = tilt;
+      this.currentCameraConnection?.connection.setState(this.state);
+    });
+
+    this.pad.keypadEvents$.on("zoom", (zoom) => {
+      this.state.zoom = zoom;
+      this.currentCameraConnection?.connection.setState(this.state);
+    });
+
+    this.pad.keypadEvents$.on("focus", (focus) => {
+      this.state.focus = focus;
+      this.currentCameraConnection?.connection.setState(this.state);
+    });
+
+    this.pad.keypadEvents$.on("inputChange", (advance) => {
+      this.changeConnection(advance);
+    });
+
+    this.pad.keypadEvents$.on("cut", () => {
+      this.atem.cut(config.AtemMixEffectBlock);
+    });
+
+    this.pad.keypadEvents$.on("auto", () => {
+      this.atem.auto(config.AtemMixEffectBlock);
+    });
+
+    this.pad.keypadEvents$.on("keyToggle", (index) => {
+      if (config.AtemToggleKeyIndexes[index] !== undefined) {
+        this.atem.toggleKey(
+          config.AtemToggleKeyIndexes[index],
+          config.AtemMixEffectBlock
+        );
+      }
+    });
   }
 
   changeConnection(advance: number) {
@@ -95,6 +103,9 @@ export class GameController {
     this.cameraConnections.forEach((connection, index) => {
       if (connection.AtemImputNumber === preview) {
         this.currentCameraConnection = { index, connection };
+        if (isProgram) {
+          this.pad.rumble();
+        }
       }
     });
     this.printConnection();
@@ -104,7 +115,7 @@ export class GameController {
     if (this.currentCameraConnection !== undefined) {
       this.currentCameraConnection.connection.printConnection();
     } else {
-      console.log("Selected input that is not a camera");
+      console.log("Input selected that is not managed with this application");
     }
   }
 

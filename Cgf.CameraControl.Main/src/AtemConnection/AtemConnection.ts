@@ -1,17 +1,17 @@
-import { Atem, AtemState } from "atem-connection";
+import { Atem } from "atem-connection";
 import { AtemConnectionConfig } from "./AtemConnectionConfig";
 import StrictEventEmitter from "strict-event-emitter-types";
 import { EventEmitter } from "events";
 
-interface MeEvents {
+export interface IMeEvents {
   previewUpdate: (preview: number, isProgram: boolean) => void;
 }
 
 export class AtemConnection {
-  private readonly mixermap: Map<
+  private readonly mixermap = new Map<
     number,
-    StrictEventEmitter<EventEmitter, MeEvents>
-  > = new Map<number, StrictEventEmitter<EventEmitter, MeEvents>>();
+    StrictEventEmitter<EventEmitter, IMeEvents>
+  >();
   private readonly atem: Atem;
   constructor(config: AtemConnectionConfig) {
     this.atem = new Atem();
@@ -28,26 +28,27 @@ export class AtemConnection {
     this.atem.on("stateChanged", (state, pathToChange) => {
       state.video.mixEffects.forEach((state, index) => {
         if (state !== undefined) {
-          var emitter = this.mixermap.get(index);
-          emitter?.emit(
-            "previewUpdate",
-            state.previewInput,
-            state.previewInput === state?.programInput
+          const emitter = this.mixermap.get(index);
+          const onAirInputs = this.atem.listVisibleInputs("program");
+          const newPreviewIsOnAir = onAirInputs.some(
+            (input) => input === state.previewInput
           );
+          emitter?.emit("previewUpdate", state.previewInput, newPreviewIsOnAir);
         }
       });
     });
   }
 
-  onPreviewStateUpdate(
-    mixer: number,
-    callback: (preview: number, isProgram: boolean) => void
-  ): void {
-    if (!this.mixermap.has(mixer)) {
-      this.mixermap.set(mixer, new EventEmitter());
+  previewStateUpdateEmitterGet(
+    mixer: number
+  ): StrictEventEmitter<EventEmitter, IMeEvents> {
+    let retval = this.mixermap.get(mixer);
+    if (retval) {
+      return retval;
     }
-    const emitter = this.mixermap.get(mixer);
-    emitter?.on("previewUpdate", callback);
+    retval = new EventEmitter();
+    this.mixermap.set(mixer, retval);
+    return retval;
   }
 
   changePreview(me: number, index: number) {
