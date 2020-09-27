@@ -4,5 +4,5 @@ export interface ControllerConfig {
   ControllerType: string;
   AtemMixEffectBlock: number;
   AtemToggleKeyIndexes: Array<number>;
-  CameraConnections: Array<ImageConnectionConfig>;
+  ImageConnections: Array<ImageConnectionConfig>;
 }

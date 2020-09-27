@@ -11,7 +11,7 @@
       "AtemConnection": "me4",
       "AtemMixEffectBlock": 2,
       "AtemToggleKeyIndexes": [0, 1],
-      "CameraConnections": [
+      "ImageConnections": [
         {
           "ConnectionName": "Cam1",
           "AtemInputNumber": 1,

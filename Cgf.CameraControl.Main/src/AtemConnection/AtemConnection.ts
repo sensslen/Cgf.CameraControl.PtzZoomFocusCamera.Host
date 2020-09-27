@@ -1,4 +1,4 @@
-import { Atem } from "atem-connection";
+import { Atem, AtemState } from "atem-connection";
 import { AtemConnectionConfig } from "./AtemConnectionConfig";
 import StrictEventEmitter from "strict-event-emitter-types";
 import { EventEmitter } from "events";
@@ -23,19 +23,26 @@ export class AtemConnection {
 
     this.atem.on("connected", () => {
       console.log("atem connection established (" + config.IP + ")");
+      if (this.atem.state) {
+        this.stateChange(this.atem.state);
+      }
     });
 
     this.atem.on("stateChanged", (state, pathToChange) => {
-      state.video.mixEffects.forEach((state, index) => {
-        if (state !== undefined) {
-          const emitter = this.mixermap.get(index);
-          const onAirInputs = this.atem.listVisibleInputs("program");
-          const newPreviewIsOnAir = onAirInputs.some(
-            (input) => input === state.previewInput
-          );
-          emitter?.emit("previewUpdate", state.previewInput, newPreviewIsOnAir);
-        }
-      });
+      this.stateChange(state);
+    });
+  }
+
+  private stateChange(state: AtemState) {
+    state.video.mixEffects.forEach((state, index) => {
+      if (state !== undefined) {
+        const emitter = this.mixermap.get(index);
+        const onAirInputs = this.atem.listVisibleInputs("program");
+        const newPreviewIsOnAir = onAirInputs.some(
+          (input) => input === state.previewInput
+        );
+        emitter?.emit("previewUpdate", state.previewInput, newPreviewIsOnAir);
+      }
     });
   }
 
@@ -51,11 +58,11 @@ export class AtemConnection {
     return retval;
   }
 
-  changePreview(me: number, index: number) {
+  changePreview(me: number, index: number): void {
     this.atem.changePreviewInput(index, me);
   }
 
-  toggleKey(keyIndex: number, me: number) {
+  toggleKey(keyIndex: number, me: number): void {
     if (this.atem.state !== undefined) {
       const meState = this.atem.state.video.mixEffects[me];
       if (meState !== undefined) {
@@ -67,11 +74,16 @@ export class AtemConnection {
     }
   }
 
-  cut(me: number) {
+  cut(me: number): void {
     this.atem.cut(me);
   }
 
-  auto(me: number) {
+  auto(me: number): void {
     this.atem.autoTransition(me);
+  }
+
+  nameGet(index: number): string {
+    let retval = this.atem.state?.inputs[index]?.longName;
+    return retval ? retval : "";
   }
 }

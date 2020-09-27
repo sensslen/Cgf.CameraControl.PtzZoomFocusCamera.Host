@@ -2,7 +2,7 @@ import { State } from "../State";
 
 export interface IImageConnection {
   setState(state: State): void;
-  printConnection(): void;
+  connectionAdditionalInfo(): string;
 
   readonly AtemImputNumber: number;
 }

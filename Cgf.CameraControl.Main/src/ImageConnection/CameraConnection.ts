@@ -143,7 +143,7 @@ export class CameraConnection extends AbstractImageConnection {
     this.transmitNextStateIfRequestedAndPossible();
   }
 
-  printConnection() {
-    this.printConnectionWithAdditionalInfo(this.cameraConfig.ConnectionUrl);
+  connectionAdditionalInfo(): string {
+    return this.cameraConfig.ConnectionUrl;
   }
 }

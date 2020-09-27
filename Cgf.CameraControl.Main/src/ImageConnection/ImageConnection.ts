@@ -7,11 +7,11 @@ export class ImageConnection extends AbstractImageConnection {
     super(config);
   }
 
-  setState(state: State): void {
+  public setState(state: State): void {
     // do nothing intentionally - we cannot send a state to this connection
   }
 
-  printConnection(): void {
-    this.printConnectionWithAdditionalInfo();
+  public connectionAdditionalInfo(): string {
+    return "";
   }
 }

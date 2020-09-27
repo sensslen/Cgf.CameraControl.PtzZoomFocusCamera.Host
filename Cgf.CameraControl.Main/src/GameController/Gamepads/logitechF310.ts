@@ -34,7 +34,7 @@ export class logitechF310 implements IGamePad {
         this.moveInterpolation[1]
       )[0];
       this.keypadEvents$.emit("pan", Math.round(pan));
-      let tilt = interpolate(
+      let tilt = -interpolate(
         value.y,
         this.moveInterpolation[0],
         this.moveInterpolation[1]

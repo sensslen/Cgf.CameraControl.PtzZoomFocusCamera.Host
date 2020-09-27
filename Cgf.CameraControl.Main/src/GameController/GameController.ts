@@ -8,7 +8,7 @@ import { IGamePad } from "./Gamepads/IGamePad";
 
 export class GameController {
   private state: State;
-  private cameraConnections: Array<IImageConnection> = [];
+  private imageConnections: Array<IImageConnection> = [];
   private currentCameraConnection?: {
     index: number;
     connection: IImageConnection;
@@ -22,8 +22,8 @@ export class GameController {
     this.pad = GamepadFactory.getGamepad(config);
     this.connectGamepad(config);
 
-    config.CameraConnections.forEach((c) => {
-      this.cameraConnections.push(ImageConnectionFactory.GetImageConnection(c));
+    config.ImageConnections.forEach((c) => {
+      this.imageConnections.push(ImageConnectionFactory.GetImageConnection(c));
     });
 
     this.AtemMixEffectBlock = config.AtemMixEffectBlock;
@@ -82,13 +82,13 @@ export class GameController {
     if (this.currentCameraConnection !== undefined) {
       nextIndex = this.mod(
         this.currentCameraConnection.index + advance,
-        this.cameraConnections.length
+        this.imageConnections.length
       );
     }
 
     this.atem.changePreview(
       this.AtemMixEffectBlock,
-      this.cameraConnections[nextIndex].AtemImputNumber
+      this.imageConnections[nextIndex].AtemImputNumber
     );
   }
 
@@ -100,7 +100,7 @@ export class GameController {
     }
 
     this.currentCameraConnection = undefined;
-    this.cameraConnections.forEach((connection, index) => {
+    this.imageConnections.forEach((connection, index) => {
       if (connection.AtemImputNumber === preview) {
         this.currentCameraConnection = { index, connection };
         if (isProgram) {
@@ -113,7 +113,14 @@ export class GameController {
 
   printConnection() {
     if (this.currentCameraConnection !== undefined) {
-      this.currentCameraConnection.connection.printConnection();
+      let additionalInfo = this.currentCameraConnection.connection.connectionAdditionalInfo();
+      console.log(
+        `${
+          this.currentCameraConnection.connection.AtemImputNumber
+        } - ${this.atem.nameGet(
+          this.currentCameraConnection.connection.AtemImputNumber
+        )}${additionalInfo ? `(${additionalInfo})` : ""}`
+      );
     } else {
       console.log("Input selected that is not managed with this application");
     }
