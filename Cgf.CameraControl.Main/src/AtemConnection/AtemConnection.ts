@@ -33,7 +33,7 @@ export class AtemConnection {
     });
   }
 
-  private stateChange(state: AtemState) {
+  private stateChange(state: AtemState): void {
     state.video.mixEffects.forEach((state, index) => {
       if (state !== undefined) {
         const emitter = this.mixermap.get(index);
