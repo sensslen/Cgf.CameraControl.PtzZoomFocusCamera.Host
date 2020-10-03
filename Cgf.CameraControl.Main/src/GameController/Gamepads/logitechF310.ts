@@ -1,5 +1,5 @@
 import { JoyStickValue } from "./JoyStickValue";
-import { IGamePad, IGamepadEvents } from "./IGamePad";
+import { IGamePad, IGamepadEvents, InputChangeDirection } from "./IGamePad";
 import { EventEmitter } from "events";
 import StrictEventEmitter from "strict-event-emitter-types";
 
@@ -48,19 +48,19 @@ export class logitechF310 implements IGamePad {
     });
 
     this.pad.on("dpadLeft:press", () => {
-      this.keypadEvents$.emit("inputChange", -1);
+      this.keypadEvents$.emit("inputChange", InputChangeDirection.left);
     });
 
     this.pad.on("dpadUp:press", () => {
-      this.keypadEvents$.emit("inputChange", -4);
+      this.keypadEvents$.emit("inputChange", InputChangeDirection.up);
     });
 
     this.pad.on("dpadRight:press", () => {
-      this.keypadEvents$.emit("inputChange", 1);
+      this.keypadEvents$.emit("inputChange", InputChangeDirection.right);
     });
 
     this.pad.on("dpadDown:press", () => {
-      this.keypadEvents$.emit("inputChange", 4);
+      this.keypadEvents$.emit("inputChange", InputChangeDirection.down);
     });
 
     this.pad.on("RB:press", () => {

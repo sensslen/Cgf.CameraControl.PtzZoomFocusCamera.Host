@@ -4,15 +4,21 @@ import { ControllerConfig } from "./ControllerConfig";
 import { AtemConnection } from "../AtemConnection/AtemConnection";
 import { IImageConnection } from "../ImageConnection/IImageConnection";
 import { GamepadFactory } from "./Gamepads/GamepadFactory";
-import { IGamePad } from "./Gamepads/IGamePad";
+import { IGamePad, InputChangeDirection } from "./Gamepads/IGamePad";
+
+class InternalImageConnection {
+  constructor(
+    public readonly connection: IImageConnection,
+    public readonly connectionChangeDefinition: {
+      [key in InputChangeDirection]: number;
+    }
+  ) {}
+}
 
 export class GameController {
   private state: State;
-  private imageConnections: Array<IImageConnection> = [];
-  private currentCameraConnection?: {
-    index: number;
-    connection: IImageConnection;
-  };
+  private imageConnections: Array<InternalImageConnection> = [];
+  private currentCameraConnection?: InternalImageConnection;
   private AtemMixEffectBlock: number;
   private pad: IGamePad;
 
@@ -23,7 +29,12 @@ export class GameController {
     this.connectGamepad(config);
 
     config.ImageConnections.forEach((c) => {
-      this.imageConnections.push(ImageConnectionFactory.GetImageConnection(c));
+      this.imageConnections.push(
+        new InternalImageConnection(
+          ImageConnectionFactory.GetImageConnection(c),
+          c.ConnectionChangeDefinition
+        )
+      );
     });
 
     this.AtemMixEffectBlock = config.AtemMixEffectBlock;
@@ -55,8 +66,8 @@ export class GameController {
       this.currentCameraConnection?.connection.setState(this.state);
     });
 
-    this.pad.keypadEvents$.on("inputChange", (advance) => {
-      this.changeConnection(advance);
+    this.pad.keypadEvents$.on("inputChange", (direction) => {
+      this.changeConnection(direction);
     });
 
     this.pad.keypadEvents$.on("cut", () => {
@@ -77,18 +88,15 @@ export class GameController {
     });
   }
 
-  changeConnection(advance: number) {
-    let nextIndex = 0;
-    if (this.currentCameraConnection !== undefined) {
-      nextIndex = this.mod(
-        this.currentCameraConnection.index + advance,
-        this.imageConnections.length
-      );
-    }
+  changeConnection(direction: InputChangeDirection) {
+    let nextIndex = this.currentCameraConnection?.connectionChangeDefinition[
+      direction
+    ];
 
     this.atem.changePreview(
       this.AtemMixEffectBlock,
-      this.imageConnections[nextIndex].AtemImputNumber
+      this.imageConnections[nextIndex ? nextIndex : 0].connection
+        .AtemImputNumber
     );
   }
 
@@ -100,9 +108,9 @@ export class GameController {
     }
 
     this.currentCameraConnection = undefined;
-    this.imageConnections.forEach((connection, index) => {
-      if (connection.AtemImputNumber === preview) {
-        this.currentCameraConnection = { index, connection };
+    this.imageConnections.forEach((imageConnection) => {
+      if (imageConnection.connection.AtemImputNumber === preview) {
+        this.currentCameraConnection = imageConnection;
         if (isProgram) {
           this.pad.rumble();
         }

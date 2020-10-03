@@ -1,4 +1,3 @@
-import { AbstractImageConnection } from "./AbstractImageConnection";
 import { CameraConnection } from "./CameraConnection";
 import { CameraConnectionConfig } from "./CameraConnectionConfig";
 import { IImageConnection } from "./IImageConnection";

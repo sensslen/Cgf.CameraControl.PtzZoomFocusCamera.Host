@@ -13,16 +13,26 @@
       "AtemToggleKeyIndexes": [0, 1],
       "ImageConnections": [
         {
-          "ConnectionName": "Cam1",
           "AtemInputNumber": 1,
           "CgfCameraConnection": {
-            "ConnectionUrl": "http://localhost:5000",
-            "ConnectionPort": "COM6"
+            "ConnectionUrl": "http://localhost:5000"
+          },
+          "ConnectionPort": "COM6",
+          "ConnectionChangeDefinition": {
+            "up": 1,
+            "down": 1,
+            "left": 2,
+            "right": 2
           }
         },
         {
-          "ConnectionName": "Input2",
-          "AtemInputNumber": 2
+          "AtemInputNumber": 2,
+          "ConnectionChangeDefinition": {
+            "up": 2,
+            "down": 2,
+            "left": 1,
+            "right": 1
+          }
         }
       ]
     }
