@@ -89,15 +89,15 @@ export class GameController {
   }
 
   changeConnection(direction: InputChangeDirection) {
-    let nextIndex = this.currentCameraConnection?.connectionChangeDefinition[
+    let next = this.currentCameraConnection?.connectionChangeDefinition[
       direction
     ];
+    let nextInput = next
+      ? next
+      : this.imageConnections[0].connection.AtemImputNumber;
 
-    this.atem.changePreview(
-      this.AtemMixEffectBlock,
-      this.imageConnections[nextIndex ? nextIndex : 0].connection
-        .AtemImputNumber
-    );
+    console.log("select:" + nextInput);
+    this.atem.changePreview(this.AtemMixEffectBlock, nextInput);
   }
 
   selectedConnectionChanged(preview: number, isProgram: boolean): void {
