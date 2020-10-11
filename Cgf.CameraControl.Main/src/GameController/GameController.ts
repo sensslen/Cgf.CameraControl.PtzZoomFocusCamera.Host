@@ -96,7 +96,6 @@ export class GameController {
       ? next
       : this.imageConnections[0].connection.AtemImputNumber;
 
-    console.log("select:" + nextInput);
     this.atem.changePreview(this.AtemMixEffectBlock, nextInput);
   }
 
