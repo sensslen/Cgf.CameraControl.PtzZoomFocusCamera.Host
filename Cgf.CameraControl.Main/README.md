@@ -2,11 +2,6 @@
 
 Typescript application that uses a Gamepad to control a Video mixer and multiple cameras.
 
-## Current state of the project
-
--   [ ] Control [Blackmagicdesign Atem Switcher](https://www.blackmagicdesign.com/)
--   [x] Camera inkl. Pan/Tilt Head (see [Cgf.CameraControl.CameraHost](../Cgf.CameraControl.CameraHost))
-
 ## Quick start
 
 To start using this project use the following steps:
