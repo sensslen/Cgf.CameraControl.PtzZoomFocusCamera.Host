@@ -4,7 +4,7 @@ import { IControllerConfig } from './IControllerConfig';
 import { AtemConnection } from '../AtemConnection/AtemConnection';
 import { IImageConnection } from '../ImageConnection/IImageConnection';
 import { GamepadFactory } from './Gamepads/GamepadFactory';
-import { IGamePad, InputChangeDirection } from './Gamepads/IGamePad';
+import { AlternateInputChangeDirection, IGamePad, InputChangeDirection } from './Gamepads/IGamePad';
 
 class InternalImageConnection {
     constructor(
