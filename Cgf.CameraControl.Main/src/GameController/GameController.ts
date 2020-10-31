@@ -1,11 +1,10 @@
 import { ImageConnectionFactory } from '../ImageConnection/ImageConnectionFactory';
 import { State } from '../State';
-import { ControllerConfig } from './ControllerConfig';
+import { IControllerConfig } from './IControllerConfig';
 import { AtemConnection } from '../AtemConnection/AtemConnection';
 import { IImageConnection } from '../ImageConnection/IImageConnection';
 import { GamepadFactory } from './Gamepads/GamepadFactory';
-import { AlternateInputChangeDirection, IGamePad, InputChangeDirection } from './Gamepads/IGamePad';
-import { number } from 'yargs';
+import { IGamePad, InputChangeDirection } from './Gamepads/IGamePad';
 
 class InternalImageConnection {
     constructor(
@@ -26,7 +25,7 @@ export class GameController {
     private AtemMixEffectBlock: number;
     private pad: IGamePad;
 
-    constructor(config: ControllerConfig, private atem: AtemConnection) {
+    constructor(config: IControllerConfig, private atem: AtemConnection) {
         this.state = new State();
 
         this.pad = GamepadFactory.getGamepad(config);
@@ -50,7 +49,7 @@ export class GameController {
             );
     }
 
-    private connectGamepad(config: ControllerConfig) {
+    private connectGamepad(config: IControllerConfig) {
         this.pad.keypadEvents$.on('pan', (pan) => {
             this.state.pan = pan;
             this.currentCameraConnection?.connection.setState(this.state);

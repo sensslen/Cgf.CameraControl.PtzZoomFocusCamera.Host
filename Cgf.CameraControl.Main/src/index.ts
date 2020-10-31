@@ -1,5 +1,5 @@
 import { GameController } from './GameController/GameController';
-import { ControllerConfig } from './GameController/ControllerConfig';
+import { IControllerConfig } from './GameController/IControllerConfig';
 import { AtemConnection } from './AtemConnection/AtemConnection';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,13 +7,12 @@ import Dictionary from './Dictionary/Dictionary';
 import yargs = require('yargs/yargs');
 import { AtemConnectionConfig } from './AtemConnection/AtemConnectionConfig';
 
-interface IInternalGameControllerConfig {
-    ControllerConfig: ControllerConfig;
+interface IInternalGameControllerConfig extends IControllerConfig {
     AtemConnection: string;
 }
 
 interface IConfigFile {
-    Gamepads: Array<IInternalGameControllerConfig>;
+    Controllers: Array<IInternalGameControllerConfig>;
     AtemConnections: Array<AtemConnectionConfig>;
 }
 
@@ -28,6 +27,6 @@ config.AtemConnections.forEach((c) => {
     atemInstances.add(c.identifier, new AtemConnection(c));
 });
 
-config.Gamepads.forEach((c) => {
-    new GameController(c.ControllerConfig, atemInstances.getItem(c.AtemConnection));
+config.Controllers.forEach((c) => {
+    new GameController(c, atemInstances.getItem(c.AtemConnection));
 });
