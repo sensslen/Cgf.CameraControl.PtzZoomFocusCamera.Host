@@ -91,24 +91,28 @@ export class GameController {
 
     changeConnection(direction: InputChangeDirection, directionAlt: AlternateInputChangeDirection) {
         let next: number | undefined = undefined;
-        switch (directionAlt) {
-            case AlternateInputChangeDirection.alt:
-                if (this.currentCameraConnection) {
+        if (this.currentCameraConnection) {
+            switch (directionAlt) {
+                case AlternateInputChangeDirection.alt:
                     if (this.currentCameraConnection.altConnectionChangeDefinition) {
                         next = this.currentCameraConnection.altConnectionChangeDefinition[direction];
                     } else {
                         next = this.currentCameraConnection.connectionChangeDefinition[direction];
                     }
-                }
-                break;
-            case AlternateInputChangeDirection.none:
-                next = this.currentCameraConnection?.connectionChangeDefinition[direction];
-                break;
+                    break;
+                case AlternateInputChangeDirection.none:
+                    next = this.currentCameraConnection?.connectionChangeDefinition[direction];
+                    break;
+            }
+        } else {
+            // select first connection if chrrent connection is not defined
+            // (used to be sure to be able to change even though the current input in not specified)
+            next = this.imageConnections[0]?.connection.AtemImputNumber;
         }
 
-        let nextInput = next ? next : this.imageConnections[0].connection.AtemImputNumber;
-
-        this.atem.changePreview(this.AtemMixEffectBlock, nextInput);
+        if (next) {
+            this.atem.changePreview(this.AtemMixEffectBlock, next);
+        }
     }
 
     selectedConnectionChanged(preview: number, isOnAir: boolean): void {
