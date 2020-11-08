@@ -40,7 +40,7 @@ The application basically supports connections to multiple video mixers. These a
 
 Also there are multiple gamepads supported by one instance of the application. Each gamepad connects to exactly one ME Block on the video mixer and allows to control it. Then there may be an arbitrary number of [Image Connections](#image_connections) associated with it.
 
-> :warning: **Currently there is the unfortunate restriction to only support one gamepad per gamepad type, as this kind of is a restriction of the gamepad connection library used. This is planned to be changed in the future.**
+> :warning: **Currently there is the unfortunate restriction to only support one gamepad per gamepad type. This is a restriction of the gamepad connection library used. This is planned to be changed in the future.**
 
 ```json
  "Controllers": [
