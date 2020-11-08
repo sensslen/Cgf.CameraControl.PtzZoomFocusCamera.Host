@@ -23,7 +23,7 @@ The configuration format is basically shown in [src/config.json](./src/config.js
 
 The application basically supports connections to multiple video mixers. These are configured in the AtemConnections array which is located in the root element of the configuration file directly.
 
-```json
+```json5
     "AtemConnections": [
         {
             "identifier": "me4",
@@ -42,7 +42,7 @@ Also there are multiple gamepads supported by one instance of the application. E
 
 > :warning: **Currently there is the unfortunate restriction to only support one gamepad per gamepad type. This is a restriction of the gamepad connection library used. This is planned to be changed in the future.**
 
-```json
+```json5
  "Controllers": [
         {
             // Type of the gamepad to connect to
@@ -72,7 +72,7 @@ Also there are multiple gamepads supported by one instance of the application. E
 
 The `ImageConnections` tag allows to specify an arbitrary number of Inputs to the video Mixer to be controlled via a Gamepad. This tag is structured like following:
 
-```json
+```json5
 {
     // The input number of the image (this corresponds to the physical input number on the video mixer)
     // The name of the input is taken from ATEM
