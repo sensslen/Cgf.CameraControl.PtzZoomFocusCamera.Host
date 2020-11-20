@@ -1,5 +1,5 @@
 import { JoyStickValue } from './JoyStickValue';
-import { AlternateInputChangeDirection, IGamePad, IGamepadEvents, InputChangeDirection } from './IGamePad';
+import { AltKeyState, IGamePad, IGamepadEvents, InputChangeDirection, SpecialFunctionKey } from './IGamePad';
 import { EventEmitter } from 'events';
 import StrictEventEmitter from 'strict-event-emitter-types';
 
@@ -8,7 +8,7 @@ const interpolate = require('everpolate').linear;
 
 export class logitechF310 implements IGamePad {
     private pad: any;
-    private altkeyState: AlternateInputChangeDirection = AlternateInputChangeDirection.none;
+    private altkeyState: AltKeyState = AltKeyState.none;
     private readonly moveInterpolation: number[][] = [
         [0, 63, 31, 127, 128, 160, 172, 255],
         [255, 70, 20, 0, 0, -20, -70, -255],
@@ -59,35 +59,43 @@ export class logitechF310 implements IGamePad {
         });
 
         this.pad.on('LB:press', () => {
-            if (this.altkeyState == AlternateInputChangeDirection.none) {
-                this.altkeyState = AlternateInputChangeDirection.alternateKeyUpper;
+            if (this.altkeyState == AltKeyState.none) {
+                this.altkeyState = AltKeyState.altKeyUpper;
             }
         });
 
         this.pad.on('LB:release', () => {
-            if (this.altkeyState == AlternateInputChangeDirection.alternateKeyUpper) {
-                this.altkeyState = AlternateInputChangeDirection.none;
+            if (this.altkeyState == AltKeyState.altKeyUpper) {
+                this.altkeyState = AltKeyState.none;
             }
         });
 
         this.pad.on('LT:press', () => {
-            if (this.altkeyState == AlternateInputChangeDirection.none) {
-                this.altkeyState = AlternateInputChangeDirection.alternateKeyLower;
+            if (this.altkeyState == AltKeyState.none) {
+                this.altkeyState = AltKeyState.altKeyLower;
             }
         });
 
         this.pad.on('LT:release', () => {
-            if (this.altkeyState == AlternateInputChangeDirection.alternateKeyLower) {
-                this.altkeyState = AlternateInputChangeDirection.none;
+            if (this.altkeyState == AltKeyState.altKeyLower) {
+                this.altkeyState = AltKeyState.none;
             }
         });
 
         this.pad.on('A:press', () => {
-            this.keypadEvents$.emit('keyToggle', 0);
+            this.keypadEvents$.emit('specialFunction', SpecialFunctionKey.a, this.altkeyState);
         });
 
         this.pad.on('B:press', () => {
-            this.keypadEvents$.emit('keyToggle', 1);
+            this.keypadEvents$.emit('specialFunction', SpecialFunctionKey.b, this.altkeyState);
+        });
+
+        this.pad.on('X:press', () => {
+            this.keypadEvents$.emit('specialFunction', SpecialFunctionKey.x, this.altkeyState);
+        });
+
+        this.pad.on('Y:press', () => {
+            this.keypadEvents$.emit('specialFunction', SpecialFunctionKey.y, this.altkeyState);
         });
 
         this.pad.connect();

@@ -38,7 +38,7 @@ The application basically supports connections to multiple video mixers. These a
 
 ### Gamepads
 
-Also there are multiple gamepads supported by one instance of the application. Each gamepad connects to exactly one ME Block on the video mixer and allows to control it. Then there may be an arbitrary number of [Image Connections](#image_connections) associated with it.
+Also there are multiple gamepads supported by one instance of the application. Each gamepad connects to exactly one ME Block on the video mixer and allows to control it. Then there may be an arbitrary number of [Image Connections](#image_connections) associated with it. Each gamepad also supports executing a number of special functions (setting Keys or executing macros).
 
 > :warning: **Currently there is the unfortunate restriction to only support one gamepad per gamepad type. This is a restriction of the gamepad connection library used. This is planned to be changed in the future.**
 
@@ -57,8 +57,31 @@ Also there are multiple gamepads supported by one instance of the application. E
             // The effective ME Block that should be controlled. Be aware that this number is zero based!
             "AtemMixEffectBlock": 2,
 
-            // Indexes of the Keyers that should be toggled using the "A" and "B" keys on the gamepad
-            "AtemToggleKeyIndexes": [0, 1],
+            // Key mapping for the special function keys on the Gamepad: A, B, X, Y.
+            "SpecialFunctions": {
+                "A": {
+                    "Type": "key",
+                    "Index": 0
+                },
+                "B": {
+                    "Type": "macro",
+                    "Index": 0
+                }
+            },
+            // This tag may be omitted. If so, SpecialFunctions will be used
+            "AltSpecialFunctions":{
+                "X": {
+                    "Type": "key",
+                    "Index": 1
+                }
+            },
+            // This tag may be omitted. If so, SpecialFunctions will be used
+            "AltLowerSpecialFunctions":{
+                "Y": {
+                    "Type": "macro",
+                    "Index": 2
+                }
+            },
 
             // Array of connections to images -- see Image Connections chapter below
             "ImageConnections": [
@@ -76,33 +99,33 @@ The `ImageConnections` tag allows to specify an arbitrary number of Inputs to th
 {
     // The input number of the image (this corresponds to the physical input number on the video mixer)
     // The name of the input is taken from ATEM
-    "AtemInputNumber": 1,
+    AtemInputNumber: 1,
 
     // Optional section that specifies the connection to the camera control.
     // This section is required to get access to the pan/tilt and the zoom feature of a camera
-    "CgfCameraConnection": {
-        "ConnectionUrl": "http://localhost:5000",
-        "ConnectionPort": "COM6"
+    CgfCameraConnection: {
+        ConnectionUrl: 'http://localhost:5000',
+        ConnectionPort: 'COM6',
     },
 
     // This section specifies which camera should be selected when the connection change buttons get pressed. Possible values: up, down, left, right
-    "ConnectionChangeDefinition": {
-        "left": 2,
-        "right": 2
+    ConnectionChangeDefinition: {
+        left: 2,
+        right: 2,
     },
 
     // Connection change definition when the "Alt" key is pressed while changing the connection.
     // This section may be omitted. If so, the values defined in ConnectionChangeDefinition are used
-    "AltConnectionChangeDefinition": {
-        "up": 5,
-        "down": 6
+    AltConnectionChangeDefinition: {
+        up: 5,
+        down: 6,
     },
 
     // Connection change definition when the "AltLower" key is pressed while changing the connection.
     // This section may be omitted. If so, the values defined in ConnectionChangeDefinition are used
-    "AltLowerConnectionChangeDefinition": {
-        "up": 7,
-        "down": 8
-    }
+    AltLowerConnectionChangeDefinition: {
+        up: 7,
+        down: 8,
+    },
 }
 ```
