@@ -1,30 +1,53 @@
 {
-  "AtemConnections": [
-    {
-      "identifier": "me4",
-      "IP": "192.168.1.123"
-    }
-  ],
-  "Controllers": [
-    {
-      "ControllerType": "logitech/gamepadf310",
-      "AtemConnection": "me4",
-      "AtemMixEffectBlock": 2,
-      "AtemToggleKeyIndexes": [0, 1],
-      "ImageConnections": [
+    "AtemConnections": [
         {
-          "ConnectionName": "Cam1",
-          "AtemInputNumber": 1,
-          "CgfCameraConnection": {
-            "ConnectionUrl": "http://localhost:5000",
-            "ConnectionPort": "COM6"
-          }
-        },
-        {
-          "ConnectionName": "Input2",
-          "AtemInputNumber": 2
+            "identifier": "me4",
+            "IP": "192.168.1.123"
         }
-      ]
-    }
-  ]
+    ],
+    "Controllers": [
+        {
+            "ControllerType": "logitech/gamepadf310",
+            "AtemConnection": "me4",
+            "AtemMixEffectBlock": 2,
+            "SpecialFunctions": {
+                "A": {
+                    "Type": "key",
+                    "Index": 0
+                },
+                "B": {
+                    "Type": "key",
+                    "Index": 1
+                }
+            },
+            "ImageConnections": [
+                {
+                    "AtemInputNumber": 1,
+                    "CgfCameraConnection": {
+                        "ConnectionUrl": "http://localhost:5000"
+                    },
+                    "ConnectionPort": "COM6",
+                    "ConnectionChangeDefinition": {
+                        "left": 2,
+                        "right": 2
+                    },
+                    "AltConnectionChangeDefinition": {
+                        "up": 5,
+                        "down": 6
+                    },
+                    "AltLowerConnectionChangeDefinition": {
+                        "up": 7,
+                        "down": 8
+                    }
+                },
+                {
+                    "AtemInputNumber": 2,
+                    "ConnectionChangeDefinition": {
+                        "left": 1,
+                        "right": 1
+                    }
+                }
+            ]
+        }
+    ]
 }

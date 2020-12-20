@@ -1,5 +1,8 @@
-import { CameraConnectionConfig } from "./CameraConnectionConfig";
+import { InputChangeDirection } from '../GameController/Gamepads/IGamePad';
 
 export interface ImageConnectionConfig {
-  AtemInputNumber: number;
+    AtemInputNumber: number;
+    ConnectionChangeDefinition: { [key in InputChangeDirection]: number };
+    AltConnectionChangeDefinition?: { [key in InputChangeDirection]: number };
+    AltLowerConnectionChangeDefinition?: { [key in InputChangeDirection]: number };
 }
