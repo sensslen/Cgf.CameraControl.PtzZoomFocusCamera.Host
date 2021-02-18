@@ -46,7 +46,6 @@ namespace CGF.CameraControl.CameraHost.Controllers
             return NoContent();
         }
 
-
         [HttpGet]
         [Route("connections")]
         public IEnumerable<string> GetAvailableConnections() => _communicator.AvailableConnections;

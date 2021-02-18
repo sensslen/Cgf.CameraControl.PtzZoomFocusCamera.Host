@@ -205,7 +205,7 @@ popd
 # Build the package
 pushd $WORK_FOLDER
 dpkg-deb --build $PACKAGE_NAME_AND_VERSION
-mv *.deb $output_location
+mv ./*.deb $output_location
 popd
 
 # cleanup
