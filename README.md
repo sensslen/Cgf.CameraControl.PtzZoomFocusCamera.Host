@@ -1,3 +1,4 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/sensslen/cgf.cameracontrol.ptzzoomfocuscamera.host/badge)](https://www.codefactor.io/repository/github/sensslen/cgf.cameracontrol.ptzzoomfocuscamera.host)
 # Cgf.CameraControl.CameraHost
 
 C# Application that receives commands (e.g. from [Cgf.CameraControl.Main](../Cgf.CameraControl.Main)) throuth a web interface (either a REST API or a Websocket) and provides them via a serial port (to be used by [Cgf.CameraControl.CameraController](../Cgf.CameraControl.CameraController)).
