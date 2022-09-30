@@ -144,7 +144,7 @@ Priority: optional
 Maintainer: $MAINTAINER
 Build-Depends: debhelper (>= 10)
 Architecture: armhf
-Depends: liblttng-ust0, libcurl4, libssl1.1, libkrb5-3, zlib1g, libicu63, avrdude
+Depends: liblttng-ust0, libcurl4, libssl1.1, libkrb5-2, zlib1g, libicu67, avrdude
 Description: Cgf.CameraControl.CameraHost
  Application that exposes the capabilities of Cgf.CameraControl.CameraController via a REST API and Websocket API
 EOF
