@@ -20,6 +20,7 @@ Options:
     -s|--source                 Provide a folder where the compiled source files are located.
     [-o|--output-location]      Select the folder to which the generated package should be placed to
     [-c|--create-output-folder] When specified, the output folder will be automatically created
+    [-ps|--package-name-suffix] When specified, the suffix is appended to the package name
 
     [-h|--help]                 Show this help.
 EOF
@@ -27,7 +28,7 @@ EOF
 
 get_path() {
 	echo "$(
-		cd "$(dirname "$1")"
+		cd "$(dirname "$1")" || exit
 		pwd
 	)/$(basename "$1")"
 }
@@ -44,16 +45,20 @@ CREATE_OUTPUT_FOLDER="false"
 while (("$#")); do
 	case "$1" in
 	-o | --output-location)
-		output_location=$(get_path $2)
+		output_location=$(get_path "$2")
 		shift 2
 		;;
 	-s | --source)
-		source=$(get_path $2)
+		source=$(get_path "$2")
 		shift 2
 		;;
 	-c | --create-output-folder)
 		CREATE_OUTPUT_FOLDER="true"
 		shift 1
+		;;
+	-ps | --package-name-suffix)
+		PACKAGE_NAME_SUFFIX=$2
+		shift 2
 		;;
 	-h | --help)
 		show_help
@@ -74,15 +79,15 @@ while (("$#")); do
 	esac
 done
 
-pushd $SCRIPT_LOCATION
+pushd "$SCRIPT_LOCATION" || exit
 VERSION="$(git describe --dirty)"
-echo using version number: $VERSION
-popd
+echo using version number: "$VERSION"
+popd || exit
 
 if ! [ -d "$output_location" ]; then
     if [ "$CREATE_OUTPUT_FOLDER" == "true" ]
 	then
-	    mkdir -p $output_location
+	    mkdir -p "$output_location"
 	else
         error "Could not find output folder: $output_location. Please specify an existing folder"
         exit 1
@@ -95,6 +100,9 @@ if ! [ -d "$source" ]; then
 fi
 
 PACKAGE_NAME="cgf-cameracontrol-provider"
+if [ -n "$PACKAGE_NAME_SUFFIX" ]; then
+  PACKAGE_NAME="$PACKAGE_NAME-$PACKAGE_NAME_SUFFIX"
+fi
 
 UNDER="_"
 
@@ -106,14 +114,14 @@ echo
 WORK_FOLDER=/tmp/$$
 PACKAGE_NAME_AND_VERSION=$PACKAGE_NAME$UNDER$VERSION
 PACKAGE_FOLDER=$WORK_FOLDER/$PACKAGE_NAME_AND_VERSION
-mkdir -p $PACKAGE_FOLDER
+mkdir -p "$PACKAGE_FOLDER"
 
 # Add service
 
-pushd $PACKAGE_FOLDER
+pushd "$PACKAGE_FOLDER" || exit
 INSTALLATION_FOLDER=opt/CgfCameraControl/
 mkdir -p $INSTALLATION_FOLDER
-cp -r $source/* $INSTALLATION_FOLDER
+cp -r "$source"/* $INSTALLATION_FOLDER
 
 mkdir -p lib/systemd/system
 SERVICE_NAME=cgf-cameracontrol-camerahost.service
@@ -131,10 +139,10 @@ ExecStart=/$INSTALLATION_FOLDER/Cgf.CameraControl.CameraHost --urls http://0.0.0
 [Install]
 WantedBy=multi-user.target
 EOF
-popd
+popd || exit
 
 # Add the Debian packaging files
-pushd $PACKAGE_FOLDER
+pushd "$PACKAGE_FOLDER" || exit
 mkdir DEBIAN
 cat > DEBIAN/control << EOF
 Package: $PACKAGE_NAME
@@ -200,13 +208,13 @@ echo DEBIAN/postinst:
 cat DEBIAN/postinst
 echo
 
-popd
+popd || exit
 
 # Build the package
-pushd $WORK_FOLDER
-dpkg-deb --build $PACKAGE_NAME_AND_VERSION
-mv ./*.deb $output_location
-popd
+pushd $WORK_FOLDER || exit
+dpkg-deb --build "$PACKAGE_NAME_AND_VERSION"
+mv ./*.deb "$output_location"
+popd || exit
 
 # cleanup
 rm -rf $WORK_FOLDER
