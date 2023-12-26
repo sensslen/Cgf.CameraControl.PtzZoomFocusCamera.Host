@@ -58,7 +58,7 @@ if ! [ -d "$output_location" ]; then
 fi
 
 "$SCRIPT_LOCATION"/build.sh -r linux-arm -s "$SCRIPT_LOCATION/../"
-"$SCRIPT_LOCATION"/createPackage.sh -s "$SCRIPT_LOCATION/../bin/Release/net8.0/linux-arm/publish/" -ps "linux-arm"
+"$SCRIPT_LOCATION"/createPackage.sh -s "$SCRIPT_LOCATION/../bin/Release/net8.0/linux-arm/publish/" -a "armhf"
 
 "$SCRIPT_LOCATION"/build.sh -r linux-arm64 -s "$SCRIPT_LOCATION/../"
-"$SCRIPT_LOCATION"/createPackage.sh -s "$SCRIPT_LOCATION/../bin/Release/net8.0/linux-arm64/publish/" -ps "linux-arm64"
+"$SCRIPT_LOCATION"/createPackage.sh -s "$SCRIPT_LOCATION/../bin/Release/net8.0/linux-arm64/publish/" -a "arm64"

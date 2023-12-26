@@ -20,7 +20,7 @@ Options:
     -s|--source                 Provide a folder where the compiled source files are located.
     [-o|--output-location]      Select the folder to which the generated package should be placed to
     [-c|--create-output-folder] When specified, the output folder will be automatically created
-    [-ps|--package-name-suffix] When specified, the suffix is appended to the package name
+    [-a|--architecture]         When specified, the package is created for the architecture given. the default value is armhf
 
     [-h|--help]                 Show this help.
 EOF
@@ -42,6 +42,7 @@ error() {
 output_location="$HOME"
 
 CREATE_OUTPUT_FOLDER="false"
+ARCHITECTURE="armhf"
 while (("$#")); do
 	case "$1" in
 	-o | --output-location)
@@ -56,8 +57,8 @@ while (("$#")); do
 		CREATE_OUTPUT_FOLDER="true"
 		shift 1
 		;;
-	-ps | --package-name-suffix)
-		PACKAGE_NAME_SUFFIX=$2
+	-a|--architecture)
+		ARCHITECTURE=$2
 		shift 2
 		;;
 	-h | --help)
@@ -100,9 +101,6 @@ if ! [ -d "$source" ]; then
 fi
 
 PACKAGE_NAME="cgf-cameracontrol-provider"
-if [ -n "$PACKAGE_NAME_SUFFIX" ]; then
-  PACKAGE_NAME="$PACKAGE_NAME-$PACKAGE_NAME_SUFFIX"
-fi
 
 UNDER="_"
 
@@ -113,7 +111,7 @@ echo
 
 WORK_FOLDER=/tmp/$$
 PACKAGE_NAME_AND_VERSION=$PACKAGE_NAME$UNDER$VERSION
-PACKAGE_FOLDER=$WORK_FOLDER/$PACKAGE_NAME_AND_VERSION
+PACKAGE_FOLDER=$WORK_FOLDER/$PACKAGE_NAME_AND_VERSION$UNDER$ARCHITECTURE
 mkdir -p "$PACKAGE_FOLDER"
 
 # Add service
@@ -151,7 +149,7 @@ Section: devel
 Priority: optional
 Maintainer: $MAINTAINER
 Build-Depends: debhelper (>= 10)
-Architecture: armhf
+Architecture: $ARCHITECTURE
 Depends: libc6,libgcc-s1,libgssapi-krb5-2,avrdude,libssl1.1libstdc++6,zlib1g,libicu63|libicu67|libicu72
 Description: Cgf.CameraControl.CameraHost
  Application that exposes the capabilities of Cgf.CameraControl.CameraController via a REST API and Websocket API
@@ -212,7 +210,7 @@ popd || exit
 
 # Build the package
 pushd $WORK_FOLDER || exit
-dpkg-deb --build "$PACKAGE_NAME_AND_VERSION"
+dpkg-deb --build "$PACKAGE_FOLDER"
 mv ./*.deb "$output_location"
 popd || exit
 
