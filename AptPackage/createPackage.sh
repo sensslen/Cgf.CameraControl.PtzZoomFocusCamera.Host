@@ -150,7 +150,7 @@ Priority: optional
 Maintainer: $MAINTAINER
 Build-Depends: debhelper (>= 10)
 Architecture: $ARCHITECTURE
-Depends: libc6,libgcc-s1,libgssapi-krb5-2,avrdude,libssl1.1libstdc++6,zlib1g,libicu63|libicu67|libicu72
+Depends: libc6,libgcc-s1,libgssapi-krb5-2,avrdude,libssl1.1,libstdc++6,zlib1g,libicu63|libicu67|libicu72
 Description: Cgf.CameraControl.CameraHost
  Application that exposes the capabilities of Cgf.CameraControl.CameraController via a REST API and Websocket API
 EOF
